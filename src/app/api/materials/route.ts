@@ -14,7 +14,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const { name, category, quantity } = await request.json();
-    const newMaterial = await addMaterial(name, category, quantity);
+    const newMaterial = await addMaterial(name, quantity,category );
     return NextResponse.json(newMaterial, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: 'Error adding material' }, { status: 500 });
