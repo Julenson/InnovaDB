@@ -1,6 +1,7 @@
 // db/managedb.ts
-import client, { connectClient, endClient } from '@lib/db';
+import client, { connectClient } from '@lib/db';
 import type { Material, User } from '../types';
+import { error } from 'console';
 
 export async function getPostById(postId: number) {
   await connectClient();
@@ -38,8 +39,14 @@ export async function initDatabase() {
 
 export async function getAllMaterials(): Promise<Material[]> {
   await connectClient();
-  const result = await client.query('SELECT id, name, quantity, category FROM materials');
+  try{
+    const result = await client.query('SELECT id, name, quantity, category FROM materials');
+  console.log('🧪 getAllMaterials:', result.rows);
   return result.rows as Material[];
+  } catch {
+    console.error('❌ Error en getAllMaterials:', error);
+    throw error;
+  }
 }
 
 export async function getMaterialById(id: number): Promise<Material | undefined> {
