@@ -1,10 +1,10 @@
 // src/lib/db.ts
 import { Pool } from 'pg';
 
-const connectionString = process.env.NETLIFY_DATABASE_URL;
+const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
-  throw new Error('❌ NETLIFY_DATABASE_URL no definida');
+  throw new Error('❌ DATABASE_URL no definida');
 }
 
 let client: any;
