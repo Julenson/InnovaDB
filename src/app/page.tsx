@@ -92,7 +92,7 @@ export default function LoginPage() {
                 name="password" 
                 type="password" 
                 required 
-                defaultValue="demopassword"
+                defaultValue="demoinnovasport"
               />
             </div>
              {error && (
