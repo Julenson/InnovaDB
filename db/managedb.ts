@@ -15,8 +15,8 @@ export async function initDatabase() {
     CREATE TABLE IF NOT EXISTS materials (
       id SERIAL PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
-      category VARCHAR(255),
-      quantity INTEGER NOT NULL DEFAULT 0
+      quantity INTEGER NOT NULL DEFAULT 0,
+      category VARCHAR(255)
     );
   `);
 
@@ -38,24 +38,24 @@ export async function initDatabase() {
 
 export async function getAllMaterials(): Promise<Material[]> {
   await connectClient();
-  const result = await client.query('SELECT id, name, category, quantity FROM materials');
+  const result = await client.query('SELECT id, name, quantity, category FROM materials');
   return result.rows as Material[];
 }
 
 export async function getMaterialById(id: number): Promise<Material | undefined> {
   await connectClient();
   const result = await client.query(
-    'SELECT id, name, category, quantity FROM materials WHERE id = $1',
+    'SELECT id, name, quantity, category FROM materials WHERE id = $1',
     [id]
   );
   return result.rows[0];
 }
 
-export async function addMaterial(name: string, category: string | null, quantity: number): Promise<Material> {
+export async function addMaterial(name: string, quantity: number ,category: string | null ): Promise<Material> {
   await connectClient();
   const result = await client.query(
-    'INSERT INTO materials (name, category, quantity) VALUES ($1, $2, $3) RETURNING id, name, category, quantity',
-    [name, category, quantity]
+    'INSERT INTO materials (name, quantity, category) VALUES ($1, $2, $3) RETURNING id, name, quantity, category',
+    [name, quantity, category]
   );
   return result.rows[0];
 }
@@ -63,7 +63,7 @@ export async function addMaterial(name: string, category: string | null, quantit
 export async function updateMaterialQuantity(id: number, quantity: number): Promise<Material> {
   await connectClient();
   const result = await client.query(
-    'UPDATE materials SET quantity = $1 WHERE id = $2 RETURNING id, name, category, quantity',
+    'UPDATE materials SET quantity = $1 WHERE id = $2 RETURNING id, name, quantity, category',
     [quantity, id]
   );
   return result.rows[0];
