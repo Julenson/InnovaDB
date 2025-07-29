@@ -1,4 +1,3 @@
-// src/lib/db.ts
 import { Pool } from 'pg';
 
 const connectionString = process.env.DATABASE_URL;
@@ -22,8 +21,13 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 export async function connectClient() {
-  // Pool no necesita manual connect() — se maneja solo
-  console.log('Conexión lista con Pool');
+  if (process.env.NODE_ENV === 'production') {
+    await client.connect();
+    console.log('Conectado con Client serverless');
+  } else {
+    // Pool se conecta solo al hacer query, no hace falta
+    console.log('Pool listo para conexiones');
+  }
 }
 
 export default client;
