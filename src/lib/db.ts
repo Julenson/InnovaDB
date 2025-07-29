@@ -7,6 +7,7 @@ if (!connectionString) {
 }
 
 let client: any;
+let connected = false;  // bandera para controlar conexión única
 
 if (process.env.NODE_ENV === 'production') {
   const { Client } = require('@neondatabase/serverless');
@@ -22,10 +23,13 @@ if (process.env.NODE_ENV === 'production') {
 
 export async function connectClient() {
   if (process.env.NODE_ENV === 'production') {
-    await client.connect();
-    console.log('Conectado con Client serverless');
+    if (!connected) {
+      await client.connect();
+      connected = true;
+      console.log('Conectado con Client serverless');
+    }
   } else {
-    // Pool se conecta solo al hacer query, no hace falta
+    // En dev, pool se conecta solo al hacer query
     console.log('Pool listo para conexiones');
   }
 }
