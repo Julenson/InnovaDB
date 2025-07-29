@@ -56,7 +56,7 @@ export default function LoginPage() {
         </div>
         <div className="mt-6 text-center">
             <h1 className="text-4xl font-bold text-primary-foreground tracking-tighter">Innova-Sport</h1>
-            <p className="mt-2 text-lg text-primary-foreground/80">Inventory Management</p>
+            <p className="mt-2 text-lg text-primary-foreground/80">Manejo de Inventario</p>
         </div>
          <p className="mt-auto text-sm text-primary-foreground/60">
           &copy; 2024 Innova-Sport. All Rights Reserved.

@@ -30,7 +30,10 @@ export async function POST(request: NextRequest) {
       [email, password]
     );
 
+    console.log('🧪 Resultado de consulta:', result.rows);
+
     if (result.rowCount === 0) {
+      console.log('❌ Usuario no encontrado');
       return NextResponse.json({ error: 'Credenciales inválidas' }, { status: 401 });
     }
 
