@@ -17,7 +17,8 @@ export async function initDatabase() {
       id SERIAL PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
       quantity INTEGER NOT NULL DEFAULT 0,
-      category VARCHAR(255)
+      category VARCHAR(255),
+      description VARCHAR(255)
     );
   `);
 
@@ -40,7 +41,7 @@ export async function initDatabase() {
 export async function getAllMaterials(): Promise<Material[]> {
   await connectClient();
   try{
-    const result = await client.query('SELECT id, name, quantity, category FROM materials');
+    const result = await client.query('SELECT id, name, quantity, category, description FROM materials');
   console.log('🧪 getAllMaterials:', result.rows);
   return result.rows as Material[];
   } catch {
@@ -52,17 +53,53 @@ export async function getAllMaterials(): Promise<Material[]> {
 export async function getMaterialById(id: number): Promise<Material | undefined> {
   await connectClient();
   const result = await client.query(
-    'SELECT id, name, quantity, category FROM materials WHERE id = $1',
+    'SELECT id, name, quantity, category, description FROM materials WHERE id = $1',
     [id]
   );
   return result.rows[0];
 }
 
-export async function addMaterial(name: string, quantity: number ,category: string | null ): Promise<Material> {
+export async function getMaterialByName(name: string): Promise<Material | undefined> {
   await connectClient();
   const result = await client.query(
-    'INSERT INTO materials (name, quantity, category) VALUES ($1, $2, $3) RETURNING id, name, quantity, category',
-    [name, quantity, category]
+    'SELECT id, name, quantity, category, description FROM materials WHERE name = $1',
+    [name]
+  );
+  return result.rows[0];
+}
+
+export async function getMaterialByQuantity(quantity: number): Promise<Material | undefined> {
+  await connectClient();
+  const result = await client.query(
+    'SELECT id, name, quantity, category, description FROM materials WHERE quantity = $1',
+    [quantity]
+  );
+  return result.rows[0];
+}
+
+export async function getMaterialByCategory(category: string): Promise<Material | undefined> {
+  await connectClient();
+  const result = await client.query(
+    'SELECT id, name, quantity, category, description FROM materials WHERE category = $1',
+    [category]
+  );
+  return result.rows[0];
+}
+
+export async function getMaterialByDescription(description: string): Promise<Material | undefined> {
+  await connectClient();
+  const result = await client.query(
+    'SELECT id, name, quantity, category, description FROM materials WHERE description = $1',
+    [description]
+  );
+  return result.rows[0];
+}
+
+export async function addMaterial(name: string, quantity: number ,category: string | null, description: string | null ): Promise<Material> {
+  await connectClient();
+  const result = await client.query(
+    'INSERT INTO materials (name, quantity, category, description) VALUES ($1, $2, $3, $4) RETURNING id, name, quantity, category, description',
+    [name, quantity, category, description]
   );
   return result.rows[0];
 }
@@ -70,11 +107,82 @@ export async function addMaterial(name: string, quantity: number ,category: stri
 export async function updateMaterialQuantity(id: number, quantity: number): Promise<Material> {
   await connectClient();
   const result = await client.query(
-    'UPDATE materials SET quantity = $1 WHERE id = $2 RETURNING id, name, quantity, category',
+    'UPDATE materials SET quantity = $1 WHERE id = $2 RETURNING id, name, quantity, category, description',
     [quantity, id]
   );
   return result.rows[0];
 }
+
+export async function updateMaterialName(id: number, name: string): Promise<Material>{
+  await connectClient();
+  const result = await client.query(
+    'UPDATE materials SET name = $1 WHERE id = $2 RETURNING id, name, quantity, category, description ',
+    [name, id]
+  );
+  return result.rows[0];
+}
+
+export async function updateMaterialDescription(id: number, description: string): Promise<Material>{
+  await connectClient();
+  const result = await client.query(
+    'UPDATE materials SET description = $1 WHERE id = $2 RETURNING id, name, quantity, category, description',
+    [description, id]
+  );
+  return result.row[0];
+}
+
+export async function updateMaterialCategory(id: number, category: string): Promise<Material>{
+  await connectClient();
+  const result = await client.query(
+    'UPDATE materials SET category = $1 WHERE id = $2 RETURNING id, name, quantity, category, description',
+    [category, id]
+  );
+  return result.row[0];
+}
+
+export async function updateMaterial(
+  id: number,
+  name: string | null,
+  category: string | null,
+  quantity: number | null,
+  description: string | null,
+  updatedBy: string // requerido en backend, no editable por el usuario
+): Promise<Material> {
+  await connectClient();
+  const fields = [];
+  const values = [];
+
+  if (name !== null) {
+    fields.push("name = $" + (fields.length + 1));
+    values.push(name);
+  }
+  if (category !== null) {
+    fields.push("category = $" + (fields.length + 1));
+    values.push(category);
+  }
+  if (quantity !== null) {
+    fields.push("quantity = $" + (fields.length + 1));
+    values.push(quantity);
+  }
+  if (description !== null) {
+    fields.push("description = $" + (fields.length + 1));
+    values.push(description);
+  }
+
+  fields.push("updated_by = $" + (fields.length + 1));
+  values.push(updatedBy);
+
+  fields.push("last_updated = NOW()");
+
+  const query = `UPDATE materials SET ${fields.join(", ")} WHERE id = $$${
+    values.length + 1
+  } RETURNING *`;
+  values.push(id);
+
+  const result = await client.query(query, values);
+  return result.rows[0];
+}
+
 
 export async function deleteMaterial(id: number): Promise<void> {
   await connectClient();

@@ -39,18 +39,27 @@ import {
 } from "@/components/ui/alert-dialog"
 import type { Material } from '@/lib/types';
 import { formatDistanceToNow, parseISO } from 'date-fns';
+import { EditMaterialDialog } from '@/src/components/edit-material-dialog';
 
 interface MaterialsTableProps {
   materials: Material[];
   onRemove: (id: number) => void;
   onUpdateQuantity: (id: number, change: number) => void;
+  onUpdateMaterial: (material: Partial<Material>) => void;
+  currentUser: string;
+  currentUserRole: string; // 👈 nuevo prop
 }
 
 export function MaterialsTable({
   materials,
   onRemove,
   onUpdateQuantity,
+  onUpdateMaterial,
+  currentUser,
+  currentUserRole,
 }: MaterialsTableProps) {
+  const canEdit = ['admin', 'owner', 'developer', 'employee'].includes(currentUserRole);
+
   return (
     <Card>
       <CardHeader>
@@ -67,9 +76,11 @@ export function MaterialsTable({
                 <span className="sr-only">Image</span>
               </TableHead>
               <TableHead>Nombre</TableHead>
+              <TableHead>Ud. Medición</TableHead>
               <TableHead>Cantidad</TableHead>
-              <TableHead className="text-center">Medicion</TableHead>
-              <TableHead className="hidden md:table-cell text-right">Ultima Actualización</TableHead>
+              <TableHead>Descripción</TableHead>
+              <TableHead className="hidden md:table-cell text-right">Última Actualización</TableHead>
+              <TableHead className="hidden md:table-cell text-right">Actualizado Por</TableHead>
               <TableHead>
                 <span className="sr-only">Acciones</span>
               </TableHead>
@@ -88,57 +99,75 @@ export function MaterialsTable({
                   {material.category && <Badge variant="outline">{material.category}</Badge>}
                 </TableCell>
                 <TableCell className="text-center">
-                  <div className="flex items-center justify-center gap-2">
-                    <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => onUpdateQuantity(material.id, -1)}>
-                      <Minus className="h-3 w-3" />
-                    </Button>
+                  {canEdit ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => onUpdateQuantity(material.id, -1)}>
+                        <Minus className="h-3 w-3" />
+                      </Button>
+                      <span className="font-mono text-base w-10 text-center">{material.quantity}</span>
+                      <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => onUpdateQuantity(material.id, 1)}>
+                        <Plus className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ) : (
                     <span className="font-mono text-base w-10 text-center">{material.quantity}</span>
-                     <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => onUpdateQuantity(material.id, 1)}>
-                      <Plus className="h-3 w-3" />
-                    </Button>
-                  </div>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {material.description && <Badge variant="outline">{material.description}</Badge>}
                 </TableCell>
                 <TableCell className="hidden md:table-cell text-right">
                   {material.lastUpdated ? formatDistanceToNow(parseISO(material.lastUpdated), { addSuffix: true }) : 'N/A'}
                 </TableCell>
+                <TableCell className="hidden md:table-cell text-right">
+                  {material.updatedBy ?? 'N/A'}
+                </TableCell>
                 <TableCell>
-                  <AlertDialog>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-haspopup="true"
-                          size="icon"
-                          variant="ghost"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Menu Alternado</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                        <DropdownMenuItem disabled>Editar</DropdownMenuItem>
-                        <AlertDialogTrigger asChild>
-                          <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Eliminar
-                          </DropdownMenuItem>
-                        </AlertDialogTrigger>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                     <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Estas seguro?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Esta accion no se puede deshacer. Esto eliminara de forma permanente el material
-                          "{material.name}" de tu inventario.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => onRemove(material.id)}>Continuar</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  {canEdit && (
+                    <AlertDialog>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button aria-haspopup="true" size="icon" variant="ghost">
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Menu Alternado</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                          <EditMaterialDialog
+                            material={material}
+                            trigger={<DropdownMenuItem>Editar</DropdownMenuItem>}
+                            onSave={(updatedData) => {
+                              const updatedMaterial = {
+                                ...updatedData,
+                                lastUpdated: new Date().toISOString(),
+                                updatedBy: currentUser,
+                              };
+                              onUpdateMaterial(updatedMaterial);
+                            }}
+                          />
+                          <AlertDialogTrigger asChild>
+                            <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Eliminar
+                            </DropdownMenuItem>
+                          </AlertDialogTrigger>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Esta acción no se puede deshacer. Esto eliminará de forma permanente el material "{material.name}" de tu inventario.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => onRemove(material.id)}>Continuar</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

@@ -67,7 +67,7 @@ export default function LoginPage() {
           <div className="grid gap-2 text-center">
             <h1 className="text-3xl font-bold text-primary">Bienvenido</h1>
             <p className="text-balance text-muted-foreground">
-              Introduce tu email para acceder a tu inventario.
+              Introduce tu email y tu contraseña para acceder a tu inventario.
             </p>
           </div>
           <form onSubmit={handleLogin} className="grid gap-4">
