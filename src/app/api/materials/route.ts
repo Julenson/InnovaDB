@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Name and quantity are required' }, { status: 400 });
     }
 
-    const newMaterial = await addMaterial(name, quantity, category, lastUpdated, updatedBy, description);
+    const newMaterial = await addMaterial(name, quantity, category, description, updatedBy);
     return NextResponse.json(newMaterial, { status: 201 });
   } catch (error) {
     console.error('Error añadiendo material:', error);
@@ -37,7 +37,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Si quieres actualizar más campos, tu función updateMaterialQuantity debería soportarlo
-    const updatedMaterial = await updateMaterialQuantity(id, quantity, lastUpdated, updatedBy, description);
+    const updatedMaterial = await updateMaterialQuantity(id, quantity, updatedBy);
     return NextResponse.json(updatedMaterial);
   } catch (error) {
     console.error('Error actualizando material:', error);
