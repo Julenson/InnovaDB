@@ -1,45 +1,28 @@
-// src/app/api/users/route.ts
+// src/app/api/user/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllUsers, createUser, updatePassword, deleteUser } from '@db/managedb';
+import jwt from 'jsonwebtoken';
 
-export async function GET() {
-  try {
-    const users = await getAllUsers();
-    return NextResponse.json(users);
-  } catch (error: unknown) {
-    return NextResponse.json({ error: 'Error fetching users' }, { status: 500 });
-  }
-}
+const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_a_cambiar';
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const { authenticatedUserCategory, email, password, category } = await request.json();
-    await createUser(authenticatedUserCategory, email, password, category);
-    return NextResponse.json({ message: 'User created' }, { status: 201 });
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
-    return NextResponse.json({ error: 'Error creating user' }, { status: 500 });
-  }
-}
 
-export async function PUT(request: NextRequest) {
-  try {
-    const { email, password } = await request.json();
-    await updatePassword(email, password);
-    return NextResponse.json({ message: 'Password updated' });
-  } catch (error: unknown) {
-    return NextResponse.json({ error: 'Error updating password' }, { status: 500 });
-  }
-}
+    const token = authHeader.replace('Bearer ', '');
 
-export async function DELETE(request: NextRequest) {
-  try {
-    const { email } = await request.json();
-    await deleteUser(email);
-    return NextResponse.json({ message: 'User deleted' });
-  } catch (error: unknown) {
-    return NextResponse.json({ error: 'Error deleting user' }, { status: 500 });
+    let payload;
+    try {
+      payload = jwt.verify(token, JWT_SECRET);
+    } catch {
+      return NextResponse.json({ error: 'Token inválido' }, { status: 401 });
+    }
+
+    // Devuelve el payload del JWT (user info)
+    return NextResponse.json(payload);
+  } catch (error) {
+    return NextResponse.json({ error: 'Error interno' }, { status: 500 });
   }
 }

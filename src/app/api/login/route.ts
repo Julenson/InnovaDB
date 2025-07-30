@@ -1,6 +1,12 @@
 // src/app/api/login/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import client, { connectClient } from '@lib/db';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET no está definido en las variables de entorno');
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,14 +36,29 @@ export async function POST(request: NextRequest) {
       [email, password]
     );
 
-    console.log('🧪 Resultado de consulta:', result.rows);
-
     if (result.rowCount === 0) {
-      console.log('❌ Usuario no encontrado');
       return NextResponse.json({ error: 'Credenciales inválidas' }, { status: 401 });
     }
 
-    return NextResponse.json({ message: 'Login correcto', user: result.rows[0] });
+    const user = result.rows[0];
+
+    // Aquí usamos el "!" para asegurar a TS que JWT_SECRET no es undefined
+    const token = jwt.sign(
+      { id: user.id, email: user.mail, category: user.category },
+      JWT_SECRET!,
+      { expiresIn: '8h' }
+    );
+
+    return NextResponse.json({
+      message: 'Login correcto',
+      user: {
+        id: user.id,
+        email: user.mail,
+        category: user.category,
+        name: user.name || '',
+      },
+      token,
+    });
   } catch (error) {
     console.error('❌ ERROR EN /api/login:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });

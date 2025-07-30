@@ -16,7 +16,7 @@ import type { Material } from "@/lib/types";
 
 interface Props {
   material: Material;
-  onSave: (updated: Partial<Material>) => void;
+  onSave: (updated: Material) => Promise<void>;
   trigger: React.ReactNode;
 }
 
@@ -75,4 +75,3 @@ export function EditMaterialDialog({ material, onSave, trigger }: Props) {
     </Dialog>
   );
 }
-

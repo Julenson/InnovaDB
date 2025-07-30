@@ -22,6 +22,7 @@ const newMaterialSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long.'),
   quantity: z.coerce.number().min(0, 'Quantity cannot be negative.'),
   category: z.string().min(2, 'Category is required.'),
+  description: z.string().optional().or(z.literal('')), // descripción opcional
 });
 
 type NewMaterialForm = z.infer<typeof newMaterialSchema>;
@@ -63,7 +64,7 @@ export function AddMaterialDialog({ open, onOpenChange, onAddMaterial }: AddMate
           <DialogHeader>
             <DialogTitle>Añadir Nuevo Material</DialogTitle>
             <DialogDescription>
-              Rellena la informacion para añadir un nuevo material.
+              Rellena la información para añadir un nuevo material.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -92,6 +93,15 @@ export function AddMaterialDialog({ open, onOpenChange, onAddMaterial }: AddMate
               <div className="col-span-3">
                 <Input id="category" {...register('category')} />
                 {errors.category && <p className="text-xs text-destructive mt-1">{errors.category.message}</p>}
+              </div>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="description" className="text-right">
+                Descripción
+              </Label>
+              <div className="col-span-3">
+                <Input id="description" {...register('description')} />
+                {errors.description && <p className="text-xs text-destructive mt-1">{errors.description.message}</p>}
               </div>
             </div>
           </div>

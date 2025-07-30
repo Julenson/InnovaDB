@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -22,7 +21,7 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null); // limpiar error previo
+    setError(null);
 
     const form = e.currentTarget as HTMLFormElement;
     const formData = new FormData(form);
@@ -42,8 +41,14 @@ export default function LoginPage() {
         return;
       }
 
+      const data = await res.json();
+
+      // Guardamos el token JWT en localStorage
+      localStorage.setItem('token', data.token);
+
+      // Redirigimos al dashboard
       router.push('/dashboard');
-    } catch (err) {
+    } catch {
       setError('Error en la conexión');
     }
   };
@@ -52,13 +57,17 @@ export default function LoginPage() {
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
       <div className="hidden bg-primary lg:flex lg:flex-col lg:items-center lg:justify-center lg:p-10">
         <div className="flex items-center text-primary-foreground">
-           <InnovaSportLogo className="h-24 w-24" />
+          <InnovaSportLogo className="h-24 w-24" />
         </div>
         <div className="mt-6 text-center">
-            <h1 className="text-4xl font-bold text-primary-foreground tracking-tighter">Innova-Sport</h1>
-            <p className="mt-2 text-lg text-primary-foreground/80">Manejo de Inventario</p>
+          <h1 className="text-4xl font-bold text-primary-foreground tracking-tighter">
+            Innova-Sport
+          </h1>
+          <p className="mt-2 text-lg text-primary-foreground/80">
+            Manejo de Inventario
+          </p>
         </div>
-         <p className="mt-auto text-sm text-primary-foreground/60">
+        <p className="mt-auto text-sm text-primary-foreground/60">
           &copy; 2024 Innova-Sport. All Rights Reserved.
         </p>
       </div>
@@ -85,20 +94,17 @@ export default function LoginPage() {
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
-                {/* Optional: Add "Forgot password?" link here */}
               </div>
-              <Input 
-                id="password" 
-                name="password" 
-                type="password" 
-                required 
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                required
                 defaultValue="demoinnovasport"
               />
             </div>
-             {error && (
-              <p className="text-destructive text-sm font-medium">
-                {error}
-              </p>
+            {error && (
+              <p className="text-destructive text-sm font-medium">{error}</p>
             )}
             <Button type="submit" className="w-full">
               Iniciar Sesión
