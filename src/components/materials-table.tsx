@@ -36,7 +36,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from '@/components/ui/alert-dialog';
 import type { Material } from '@/lib/types';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { EditMaterialDialog } from './edit-material-dialog';
@@ -47,7 +47,7 @@ interface MaterialsTableProps {
   onUpdateQuantity: (id: number, change: number) => void;
   onUpdateMaterial: (material: Partial<Material>) => void;
   currentUser: string;
-  currentUserRole: string; // 👈 nuevo prop
+  currentUserRole: string;
 }
 
 export function MaterialsTable({
@@ -65,7 +65,7 @@ export function MaterialsTable({
       <CardHeader>
         <CardTitle>Materiales</CardTitle>
         <CardDescription>
-          Gestiona el inventario con facilidad desde aqui.
+          Gestiona el inventario con facilidad desde aquí.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -73,100 +73,118 @@ export function MaterialsTable({
           <TableHeader>
             <TableRow>
               <TableHead className="hidden w-[100px] sm:table-cell">
-                <span className="sr-only">Image</span>
+                <span className="sr-only">Imagen</span>
               </TableHead>
               <TableHead>Nombre</TableHead>
               <TableHead>Ud. Medición</TableHead>
               <TableHead>Cantidad</TableHead>
               <TableHead>Descripción</TableHead>
-              <TableHead className="hidden md:table-cell text-right">Última Actualización</TableHead>
-              <TableHead className="hidden md:table-cell text-right">Actualizado Por</TableHead>
+              <TableHead className="hidden md:table-cell text-right">
+                Última Actualización
+              </TableHead>
+              <TableHead className="hidden md:table-cell text-right">
+                Actualizado Por
+              </TableHead>
               <TableHead>
                 <span className="sr-only">Acciones</span>
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {materials.map(material => (
+            {materials.map((material) => (
               <TableRow key={material.id}>
                 <TableCell className="hidden sm:table-cell">
                   <div className="w-16 h-16 bg-muted rounded-md flex items-center justify-center">
-                    <span className="text-2xl font-bold text-muted-foreground">{material.name.charAt(0)}</span>
+                    <span className="text-2xl font-bold text-muted-foreground">
+                      {material.name.charAt(0)}
+                    </span>
                   </div>
                 </TableCell>
                 <TableCell className="font-medium">{material.name}</TableCell>
                 <TableCell>
-                  {material.category && <Badge variant="outline">{material.category}</Badge>}
+                  {material.category && (
+                    <Badge variant="outline">{material.category}</Badge>
+                  )}
                 </TableCell>
                 <TableCell className="text-center">
                   {canEdit ? (
                     <div className="flex items-center justify-center gap-2">
-                      <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => onUpdateQuantity(material.id, -1)}>
-                        <Minus className="h-3 w-3" />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => onUpdateQuantity(material.id, -1)}
+                        disabled={material.quantity <= 0}
+                      >
+                        <Minus className="h-4 w-4" />
                       </Button>
-                      <span className="font-mono text-base w-10 text-center">{material.quantity}</span>
-                      <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => onUpdateQuantity(material.id, 1)}>
-                        <Plus className="h-3 w-3" />
+                      <span>{material.quantity}</span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => onUpdateQuantity(material.id, 1)}
+                      >
+                        <Plus className="h-4 w-4" />
                       </Button>
                     </div>
                   ) : (
-                    <span className="font-mono text-base w-10 text-center">{material.quantity}</span>
+                    material.quantity
                   )}
                 </TableCell>
-                <TableCell>
-                  {material.description && <Badge variant="outline">{material.description}</Badge>}
+                <TableCell>{material.description}</TableCell>
+                <TableCell className="hidden md:table-cell text-right">
+                  {material.lastUpdated
+                    ? formatDistanceToNow(parseISO(material.lastUpdated), {
+                        addSuffix: true,
+                      })
+                    : '—'}
                 </TableCell>
                 <TableCell className="hidden md:table-cell text-right">
-                  {material.lastUpdated ? formatDistanceToNow(parseISO(material.lastUpdated), { addSuffix: true }) : 'N/A'}
-                </TableCell>
-                <TableCell className="hidden md:table-cell text-right">
-                  {material.updatedBy ?? 'N/A'}
+                  {material.updatedBy ?? '—'}
                 </TableCell>
                 <TableCell>
                   {canEdit && (
-                    <AlertDialog>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button aria-haspopup="true" size="icon" variant="ghost">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Menu Alternado</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                          <EditMaterialDialog
-                            material={material}
-                            trigger={<DropdownMenuItem>Editar</DropdownMenuItem>}
-                            onSave={(updatedData) => {
-                              const updatedMaterial = {
-                                ...updatedData,
-                                lastUpdated: new Date().toISOString(),
-                                updatedBy: currentUser,
-                              };
-                              onUpdateMaterial(updatedMaterial);
-                            }}
-                          />
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                        <EditMaterialDialog
+                          material={material}
+                          onUpdate={onUpdateMaterial}
+                        />
+                        <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
+                            <DropdownMenuItem className="text-destructive cursor-pointer">
                               <Trash2 className="mr-2 h-4 w-4" />
                               Eliminar
                             </DropdownMenuItem>
                           </AlertDialogTrigger>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Esta acción no se puede deshacer. Esto eliminará de forma permanente el material "{material.name}" de tu inventario.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => onRemove(material.id)}>Continuar</AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                ¿Seguro que quieres eliminar?
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Esta acción no se puede deshacer.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => onRemove(material.id)}
+                              >
+                                Eliminar
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   )}
                 </TableCell>
               </TableRow>
