@@ -1,10 +1,9 @@
 'use client';
 
+import * as React from 'react';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -12,102 +11,82 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { PlusCircle } from 'lucide-react';
-import { useForm, type SubmitHandler } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { useForm } from 'react-hook-form';
 import type { Material } from '@/lib/types';
 
-const newMaterialSchema = z.object({
-  name: z.string().min(3, 'Name must be at least 3 characters long.'),
-  quantity: z.coerce.number().min(0, 'Quantity cannot be negative.'),
-  category: z.string().min(2, 'Category is required.'),
-  description: z.string().optional().or(z.literal('')), // descripción opcional
-});
-
-type NewMaterialForm = z.infer<typeof newMaterialSchema>;
-
 interface AddMaterialDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onAddMaterial: (data: Omit<Material, 'id' | 'lastUpdated'>) => void;
+  trigger: React.ReactNode;
+  onAdd: (data: Omit<Material, 'id' | 'lastUpdated'>) => Promise<void> | void;
 }
 
-export function AddMaterialDialog({ open, onOpenChange, onAddMaterial }: AddMaterialDialogProps) {
+export function AddMaterialDialog({ trigger, onAdd }: AddMaterialDialogProps) {
+  const [open, setOpen] = React.useState(false);
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<NewMaterialForm>({
-    resolver: zodResolver(newMaterialSchema),
-  });
+  } = useForm<Omit<Material, 'id' | 'lastUpdated'>>();
 
-  const onSubmit: SubmitHandler<NewMaterialForm> = data => {
-    onAddMaterial(data);
+  const onSubmit = async (data: Omit<Material, 'id' | 'lastUpdated'>) => {
+    await onAdd(data);
     reset();
-    onOpenChange(false);
+    setOpen(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button size="sm" className="h-8 gap-1">
-          <PlusCircle className="h-3.5 w-3.5" />
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-            Añadir Material
-          </span>
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogHeader>
-            <DialogTitle>Añadir Nuevo Material</DialogTitle>
-            <DialogDescription>
-              Rellena la información para añadir un nuevo material.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Nombre
-              </Label>
-              <div className="col-span-3">
-                <Input id="name" {...register('name')} />
-                {errors.name && <p className="text-xs text-destructive mt-1">{errors.name.message}</p>}
-              </div>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="quantity" className="text-right">
-                Cantidad
-              </Label>
-              <div className="col-span-3">
-                <Input id="quantity" type="number" {...register('quantity')} />
-                {errors.quantity && <p className="text-xs text-destructive mt-1">{errors.quantity.message}</p>}
-              </div>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="category" className="text-right">
-                Categoria
-              </Label>
-              <div className="col-span-3">
-                <Input id="category" {...register('category')} />
-                {errors.category && <p className="text-xs text-destructive mt-1">{errors.category.message}</p>}
-              </div>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right">
-                Descripción
-              </Label>
-              <div className="col-span-3">
-                <Input id="description" {...register('description')} />
-                {errors.description && <p className="text-xs text-destructive mt-1">{errors.description.message}</p>}
-              </div>
-            </div>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Agregar nuevo material</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <Label htmlFor="name">Nombre</Label>
+            <Input
+              id="name"
+              {...register('name', { required: 'El nombre es obligatorio' })}
+              autoFocus
+            />
+            {errors.name && (
+              <p className="text-red-600 text-sm">{errors.name.message}</p>
+            )}
           </div>
-          <DialogFooter>
-            <Button type="submit">Guardar Material</Button>
-          </DialogFooter>
+
+          <div>
+            <Label htmlFor="description">Descripción</Label>
+            <Input
+              id="description"
+              {...register('description', { required: 'La descripción es obligatoria' })}
+            />
+            {errors.description && (
+              <p className="text-red-600 text-sm">{errors.description.message}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="quantity">Cantidad</Label>
+            <Input
+              id="quantity"
+              type="number"
+              {...register('quantity', {
+                required: 'La cantidad es obligatoria',
+                valueAsNumber: true,
+                min: { value: 0, message: 'Cantidad mínima 0' },
+              })}
+            />
+            {errors.quantity && (
+              <p className="text-red-600 text-sm">{errors.quantity.message}</p>
+            )}
+          </div>
+
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit">Agregar</Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

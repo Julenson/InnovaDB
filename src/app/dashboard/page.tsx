@@ -1,111 +1,94 @@
 'use client';
 
-// src/app/dashboard/page.tsx
-import React, { useEffect, useState } from 'react';
-import { MaterialsTable } from '@/components/materials-table';  // Importar con llaves y el nombre correcto
-import { Button } from '@/components/ui/button';  // Importar Button también con llaves y con alias correcto
-import type { User, Material } from '@lib/types'
-export default function DashboardPage() {
-  const [materials, setMaterials] = useState<Material[]>([]);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [currentUserRole, setCurrentUserRole] = useState<string>('');
+import * as React from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useForm } from 'react-hook-form';
+import type { Material } from '@/lib/types';
 
-  useEffect(() => {
-    async function fetchData() {
-      const token = localStorage.getItem('token');
+interface AddMaterialDialogProps {
+  trigger: React.ReactNode;
+  onAdd: (data: Omit<Material, 'id' | 'lastUpdated'>) => Promise<void> | void;
+}
 
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
+export function AddMaterialDialog({ trigger, onAdd }: AddMaterialDialogProps) {
+  const [open, setOpen] = React.useState(false);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<Omit<Material, 'id' | 'lastUpdated'>>();
 
-      try {
-        // Obtener usuario actual
-        const userRes = await fetch('/api/user', { headers });
-        if (userRes.ok) {
-          const userData = await userRes.json();
-          setCurrentUser(userData);
-          setCurrentUserRole(userData.role || '');
-        }
-
-        // Obtener materiales
-        const matRes = await fetch('/api/materials', { headers });
-        if (matRes.ok) {
-          const matData = await matRes.json();
-          setMaterials(Array.isArray(matData.materials) ? matData.materials : []);
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    }
-
-    fetchData();
-  }, []);
-
-  async function handleRemove(materialId: number) {
-    const token = localStorage.getItem('token');
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-
-    const res = await fetch(`/api/materials/${materialId}`, {
-      method: 'DELETE',
-      headers,
-    });
-    if (res.ok) {
-      setMaterials((prev) => prev.filter((m) => m.id !== materialId));
-    }
-  }
-
-  async function handleUpdateQuantity(materialId: number, change: number) {
-    const token = localStorage.getItem('token');
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-
-    const res = await fetch(`/api/materials/${materialId}/quantity`, {
-      method: 'PATCH',
-      headers,
-      body: JSON.stringify({ change }),
-    });
-    if (res.ok) {
-      const updatedMaterial = await res.json();
-      setMaterials((prev) =>
-        prev.map((m) => (m.id === materialId ? updatedMaterial : m))
-      );
-    }
-  }
-
-  async function handleUpdateMaterial(updatedMaterial: Material) {
-    const token = localStorage.getItem('token');
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-
-    const res = await fetch(`/api/materials/${updatedMaterial.id}`, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify(updatedMaterial),
-    });
-    if (res.ok) {
-      const mat = await res.json();
-      setMaterials((prev) =>
-        prev.map((m) => (m.id === mat.id ? mat : m))
-      );
-    }
-  }
+  const onSubmit = async (data: Omit<Material, 'id' | 'lastUpdated'>) => {
+    await onAdd(data);
+    reset();
+    setOpen(false);
+  };
 
   return (
-    <div>
-      <h1>Dashboard</h1>
-      <MaterialsTable
-        materials={materials}
-        onRemove={handleRemove}
-        onUpdateQuantity={handleUpdateQuantity}
-        onUpdateMaterial={handleUpdateMaterial}
-        currentUser={currentUser}
-        currentUserRole={currentUserRole}
-      />
-      <Button variant="default">Agregar material</Button>
-    </div>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Agregar nuevo material</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <Label htmlFor="name">Nombre</Label>
+            <Input
+              id="name"
+              {...register('name', { required: 'El nombre es obligatorio' })}
+              autoFocus
+            />
+            {errors.name && (
+              <p className="text-red-600 text-sm">{errors.name.message}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="description">Descripción</Label>
+            <Input
+              id="description"
+              {...register('description', { required: 'La descripción es obligatoria' })}
+            />
+            {errors.description && (
+              <p className="text-red-600 text-sm">{errors.description.message}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="quantity">Cantidad</Label>
+            <Input
+              id="quantity"
+              type="number"
+              {...register('quantity', {
+                required: 'La cantidad es obligatoria',
+                valueAsNumber: true,
+                min: { value: 0, message: 'Cantidad mínima 0' },
+              })}
+            />
+            {errors.quantity && (
+              <p className="text-red-600 text-sm">{errors.quantity.message}</p>
+            )}
+          </div>
+
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit">Agregar</Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
