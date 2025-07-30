@@ -1,4 +1,5 @@
 'use client';
+
 // src/app/dashboard/page.tsx
 import React, { useEffect, useState } from 'react';
 import { MaterialsTable } from '@/components/materials-table';  // Importar con llaves y el nombre correcto
