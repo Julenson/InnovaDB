@@ -34,7 +34,7 @@ export default function DashboardPage() {
         const matRes = await fetch('/api/materials', { headers });
         if (matRes.ok) {
           const matData = await matRes.json();
-          setMaterials(matData.materials);
+          setMaterials(Array.isArray(matData.materials) ? matData.materials : []);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
