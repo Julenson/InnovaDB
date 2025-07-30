@@ -18,8 +18,8 @@ export async function initDatabase() {
       quantity INTEGER NOT NULL DEFAULT 0,
       category VARCHAR(255),
       description VARCHAR(255),
-      updated_by VARCHAR(255),  -- Falta campo para usuario que actualizó
-      last_updated TIMESTAMP DEFAULT NOW()  -- Falta campo para fecha última actualización
+      updatedBy VARCHAR(255),  -- Falta campo para usuario que actualizó
+      lastUpdated TIMESTAMP DEFAULT NOW()  -- Falta campo para fecha última actualización
     );
   `);
 
@@ -42,7 +42,7 @@ export async function initDatabase() {
 export async function getAllMaterials(): Promise<Material[]> {
   await connectClient();
   try {
-    const result = await client.query('SELECT id, name, quantity, category, description, updated_by, last_updated FROM materials');
+    const result = await client.query('SELECT id, name, quantity, category, description, updatedBy, lastUpdated FROM materials');
     console.log('🧪 getAllMaterials:', result.rows);
     return result.rows as Material[];
   } catch (error) {
@@ -54,7 +54,7 @@ export async function getAllMaterials(): Promise<Material[]> {
 export async function getMaterialById(id: number): Promise<Material | undefined> {
   await connectClient();
   const result = await client.query(
-    'SELECT id, name, quantity, category, description, updated_by, last_updated FROM materials WHERE id = $1',
+    'SELECT id, name, quantity, category, description, updatedBy, lastUpdated FROM materials WHERE id = $1',
     [id]
   );
   return result.rows[0];
@@ -105,15 +105,15 @@ export async function addMaterial(
 ): Promise<Material> {
   await connectClient();
   const result = await client.query(
-    `INSERT INTO materials (name, quantity, category, description, updated_by, last_updated)
+    `INSERT INTO materials (name, quantity, category, description, updatedBy, lastUpdated)
      VALUES ($1, $2, $3, $4, $5, NOW())
-     RETURNING id, name, quantity, category, description, updated_by, last_updated`,
+     RETURNING id, name, quantity, category, description, updatedBy, lastUpdated`,
     [name, quantity, category, description, updatedBy]
   );
   return result.rows[0];
 }
 
-// Cambié el updateMaterialQuantity para aceptar updatedBy y actualizar last_updated:
+// Cambié el updateMaterialQuantity para aceptar updatedBy y actualizar lastUpdated:
 export async function updateMaterialQuantity(
   id: number,
   quantity: number,
@@ -122,9 +122,9 @@ export async function updateMaterialQuantity(
   await connectClient();
   const result = await client.query(
     `UPDATE materials 
-     SET quantity = $1, updated_by = $2, last_updated = NOW()
+     SET quantity = $1, updatedBy = $2, lastUpdated = NOW()
      WHERE id = $3
-     RETURNING id, name, quantity, category, description, updated_by, last_updated`,
+     RETURNING id, name, quantity, category, description, updatedBy, lastUpdated`,
     [quantity, updatedBy, id]
   );
   return result.rows[0];
@@ -134,7 +134,7 @@ export async function updateMaterialQuantity(
 export async function updateMaterialDescription(id: number, description: string): Promise<Material> {
   await connectClient();
   const result = await client.query(
-    'UPDATE materials SET description = $1 WHERE id = $2 RETURNING id, name, quantity, category, description, updated_by, last_updated',
+    'UPDATE materials SET description = $1 WHERE id = $2 RETURNING id, name, quantity, category, description, updatedBy, lastUpdated',
     [description, id]
   );
   return result.rows[0];
@@ -143,7 +143,7 @@ export async function updateMaterialDescription(id: number, description: string)
 export async function updateMaterialCategory(id: number, category: string): Promise<Material> {
   await connectClient();
   const result = await client.query(
-    'UPDATE materials SET category = $1 WHERE id = $2 RETURNING id, name, quantity, category, description, updated_by, last_updated',
+    'UPDATE materials SET category = $1 WHERE id = $2 RETURNING id, name, quantity, category, description, updatedBy, lastUpdated',
     [category, id]
   );
   return result.rows[0];
@@ -178,11 +178,11 @@ export async function updateMaterial(
     values.push(description);
   }
 
-  // Añadimos updated_by y last_updated
-  fields.push(`updated_by = $${fields.length + 1}`);
+  // Añadimos updatedBy y lastUpdated
+  fields.push(`updatedBy = $${fields.length + 1}`);
   values.push(updatedBy);
 
-  fields.push('last_updated = NOW()');
+  fields.push('lastUpdated = NOW()');
 
   // Finalmente el id para el WHERE
   const query = `UPDATE materials SET ${fields.join(', ')} WHERE id = $${values.length + 1} RETURNING *`;
