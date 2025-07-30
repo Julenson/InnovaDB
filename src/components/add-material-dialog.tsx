@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/dialog';
 import { useForm } from 'react-hook-form';
 import type { Material } from '@/lib/types';
-import { Button } from '@/components/ui/button'; // Asumo que este es tu botón estilizado
 
 interface AddMaterialDialogProps {
   trigger: React.ReactNode | null;
@@ -35,42 +34,42 @@ export function AddMaterialDialog({ trigger, open, onOpenChange, onAdd }: AddMat
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent>
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Agregar nuevo material</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
-            <label htmlFor="name" className="block font-medium mb-1">
+            <label htmlFor="name" className="block text-sm font-medium leading-6 text-foreground">
               Nombre
             </label>
             <input
               id="name"
               {...register('name', { required: 'El nombre es obligatorio' })}
-              className="input"
+              className="mt-2 block w-full rounded-md border border-border bg-card px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
               autoFocus
             />
             {errors.name && (
-              <p className="text-red-600 text-sm">{errors.name.message}</p>
+              <p className="mt-1 text-xs text-destructive">{errors.name.message}</p>
             )}
           </div>
 
           <div>
-            <label htmlFor="category" className="block font-medium mb-1">
+            <label htmlFor="category" className="block text-sm font-medium leading-6 text-foreground">
               Categoría
             </label>
             <input
               id="category"
               {...register('category', { required: 'La categoría es obligatoria' })}
-              className="input"
+              className="mt-2 block w-full rounded-md border border-border bg-card px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
             />
             {errors.category && (
-              <p className="text-red-600 text-sm">{errors.category.message}</p>
+              <p className="mt-1 text-xs text-destructive">{errors.category.message}</p>
             )}
           </div>
 
           <div>
-            <label htmlFor="quantity" className="block font-medium mb-1">
+            <label htmlFor="quantity" className="block text-sm font-medium leading-6 text-foreground">
               Cantidad
             </label>
             <input
@@ -81,31 +80,31 @@ export function AddMaterialDialog({ trigger, open, onOpenChange, onAdd }: AddMat
                 valueAsNumber: true,
                 min: { value: 0, message: 'Cantidad mínima 0' },
               })}
-              className="input"
+              className="mt-2 block w-full rounded-md border border-border bg-card px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
             />
             {errors.quantity && (
-              <p className="text-red-600 text-sm">{errors.quantity.message}</p>
+              <p className="mt-1 text-xs text-destructive">{errors.quantity.message}</p>
             )}
           </div>
 
           <div>
-            <label htmlFor="description" className="block font-medium mb-1">
+            <label htmlFor="description" className="block text-sm font-medium leading-6 text-foreground">
               Descripción
             </label>
             <input
               id="description"
               {...register('description', { required: 'La descripción es obligatoria' })}
-              className="input"
+              className="mt-2 block w-full rounded-md border border-border bg-card px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
             />
             {errors.description && (
-              <p className="text-red-600 text-sm">{errors.description.message}</p>
+              <p className="mt-1 text-xs text-destructive">{errors.description.message}</p>
             )}
           </div>
 
-          <div className="flex justify-end space-x-2 pt-4">
+          <div className="flex justify-end space-x-4 pt-4">
             <button
               type="button"
-              className="btn-outline"
+              className="rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
               onClick={() => {
                 reset();
                 onOpenChange(false);
@@ -113,7 +112,12 @@ export function AddMaterialDialog({ trigger, open, onOpenChange, onAdd }: AddMat
             >
               Cancelar
             </button>
-            <Button type="submit">Agregar</Button>
+            <button
+              type="submit"
+              className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
+            >
+              Agregar
+            </button>
           </div>
         </form>
       </DialogContent>
