@@ -8,7 +8,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useForm } from 'react-hook-form';
@@ -17,10 +16,11 @@ import type { Material } from '@/lib/types';
 interface AddMaterialDialogProps {
   trigger: React.ReactNode;
   onAdd: (data: Omit<Material, 'id' | 'lastUpdated'>) => Promise<void> | void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function AddMaterialDialog({ trigger, onAdd }: AddMaterialDialogProps) {
-  const [open, setOpen] = React.useState(false);
+export function AddMaterialDialog({ trigger, onAdd, open, onOpenChange }: AddMaterialDialogProps) {
   const {
     register,
     handleSubmit,
@@ -31,11 +31,11 @@ export function AddMaterialDialog({ trigger, onAdd }: AddMaterialDialogProps) {
   const onSubmit = async (data: Omit<Material, 'id' | 'lastUpdated'>) => {
     await onAdd(data);
     reset();
-    setOpen(false);
+    onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -82,10 +82,19 @@ export function AddMaterialDialog({ trigger, onAdd }: AddMaterialDialogProps) {
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <button
+              type="button"
+              className="px-4 py-2 border rounded"
+              onClick={() => onOpenChange(false)}
+            >
               Cancelar
-            </Button>
-            <Button type="submit">Agregar</Button>
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Agregar
+            </button>
           </div>
         </form>
       </DialogContent>
