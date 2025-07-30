@@ -39,7 +39,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import type { Material } from '@/lib/types';
 import { formatDistanceToNow, parseISO } from 'date-fns';
-import { EditMaterialDialog } from '@/src/components/edit-material-dialog';
+import { EditMaterialDialog } from './edit-material-dialog';
 
 interface MaterialsTableProps {
   materials: Material[];
