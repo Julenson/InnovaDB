@@ -18,6 +18,7 @@ interface Props {
   material: Material;
   onSave: (updated: Material) => Promise<void>;
   trigger: React.ReactNode;
+  onClose: () => void;
 }
 
 export function EditMaterialDialog({ material, onSave, trigger }: Props) {

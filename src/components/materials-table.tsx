@@ -183,15 +183,12 @@ export function MaterialsTable({
 
       {/* Dialogo de edición fuera del mapa, controlado por estado */}
       {editingMaterial && (
-        <EditMaterialDialog
-          material={editingMaterial}
-          onSave={onUpdateMaterial}
-          trigger={
-            <DropdownMenuItem>
-              Editar
-            </DropdownMenuItem>
-          }
-        />
+      <EditMaterialDialog
+         material={editingMaterial}
+         onSave={onUpdateMaterial}
+         onClose={() => setEditingMaterial(null)}
+         trigger={<div />} // 👈 trigger dummy
+      />
       )}
     </>
   );
