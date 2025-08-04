@@ -1,7 +1,7 @@
 // Este archivo maneja: /api/materials
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllMaterials, addMaterial } from '@db/managedb';
+import { getAllMaterials, addMaterial, updateMaterial } from '@db/managedb';
 
 export async function GET() {
   try {
