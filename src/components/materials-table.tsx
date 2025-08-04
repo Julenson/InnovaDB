@@ -82,8 +82,8 @@ export function MaterialsTable({
                 <TableHead>Ud. Medición</TableHead>
                 <TableHead>Cantidad</TableHead>
                 <TableHead>Descripción</TableHead>
-                <TableHead className="hidden md:table-cell text-right">Última Actualización</TableHead>
-                <TableHead className="hidden md:table-cell text-right">Actualizado Por</TableHead>
+                <TableHead>Última Actualización</TableHead>
+                <TableHead>Actualizado Por</TableHead>
                 <TableHead><span className="sr-only">Acciones</span></TableHead>
               </TableRow>
             </TableHeader>
