@@ -32,9 +32,19 @@ export function EditMaterialDialog({ material, onSave, onClose, open }: Props) {
   const { data: session } = useSession();
   const currentUser = session?.user;
 
+  // Sincronizar estado cuando cambie el material
+  React.useEffect(() => {
+    setForm({
+      name: material.name || '',
+      category: material.category || '',
+      quantity: material.quantity,
+      description: material.description || '',
+    });
+  }, [material]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    const parsedValue = name ==='quantity' ? parseInt(value, 10) || 0 : value;
+    const parsedValue = name === 'quantity' ? parseInt(value, 10) || 0 : value;
     setForm((prev) => ({ ...prev, [name]: parsedValue }));
   };
 
@@ -57,19 +67,19 @@ export function EditMaterialDialog({ material, onSave, onClose, open }: Props) {
         <div className="space-y-3">
           <div>
             <Label>Nombre</Label>
-            <Input name="name" value={form.name ?? ''} onChange={handleChange} />
+            <Input name="name" value={form.name} onChange={handleChange} />
           </div>
           <div>
             <Label>Categoría</Label>
-            <Input name="category" value={form.category ?? ''} onChange={handleChange} />
+            <Input name="category" value={form.category} onChange={handleChange} />
           </div>
           <div>
             <Label>Cantidad</Label>
-            <Input name="quantity" type="number" value={form.quantity ?? ''} onChange={handleChange} />
+            <Input name="quantity" type="number" value={form.quantity} onChange={handleChange} />
           </div>
           <div>
             <Label>Descripción</Label>
-            <Textarea name="description" value={form.description ?? ''} onChange={handleChange} />
+            <Textarea name="description" value={form.description} onChange={handleChange} />
           </div>
         </div>
         <DialogFooter className="mt-4">

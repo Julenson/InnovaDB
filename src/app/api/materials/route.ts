@@ -31,37 +31,26 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const {
-      id,
-      name,
-      category,
-      quantity,
-      description,
-      updatedBy,
-      lastUpdated,
-    } = await request.json();
+    const { id, name, category, quantity, description, updatedBy, lastUpdated } = await request.json();
 
     if (!id || !updatedBy) {
-      return NextResponse.json({ error: 'ID y updatedBy son obligatorios' }, { status: 400 });
+      return NextResponse.json({ error: 'ID and updatedBy are required' }, { status: 400 });
     }
 
     const updatedMaterial = await updateMaterial({
       id,
       name,
-      quantity,
       category,
+      quantity,
       description,
       updatedBy,
       lastUpdated,
     });
 
-    if (!updatedMaterial) {
-      return NextResponse.json({ error: 'Material no encontrado o no actualizado' }, { status: 404 });
-    }
-
-    return NextResponse.json(updatedMaterial);
+    return NextResponse.json(updatedMaterial, { status: 200 });
   } catch (error) {
-    console.error('Error actualizando material:', error);
+    console.error('Error updating material:', error);
     return NextResponse.json({ error: 'Error updating material' }, { status: 500 });
   }
 }
+

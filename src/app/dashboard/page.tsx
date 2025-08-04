@@ -113,13 +113,14 @@ export default function DashboardPage() {
     const token = localStorage.getItem('token');
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
-
-    const updatedMaterial = {
-      id: material.id,
-      quantity: material.quantity,
-      description: material.description,
-      updatedBy: currentUser?.email || 'Desconocido',
-      lastUpdated: new Date().toISOString(),
+      const updatedMaterial = {
+        id: material.id,
+        name: material.name,
+        quantity: material.quantity,
+        category: material.category,
+        description: material.description,
+        updatedBy: currentUser?.email || 'Desconocido',
+        lastUpdated: new Date().toISOString(),
     };
 
     try {
@@ -141,6 +142,7 @@ export default function DashboardPage() {
       console.error('Error actualizando material:', error);
     }
   }
+
 
   async function handleAddMaterial(newMaterialData: Omit<Material, 'id' | 'lastUpdated'>) {
     const token = localStorage.getItem('token');
