@@ -22,7 +22,7 @@ export default function DashboardPage() {
         if (userRes.ok) {
           const userData = await userRes.json();
           setCurrentUser(userData);
-          setCurrentUserRole(userData.role || '');
+          setCurrentUserRole(userData.category || '');
         }
 
         const matRes = await fetch('/api/materials', { headers, cache: 'no-store' });
