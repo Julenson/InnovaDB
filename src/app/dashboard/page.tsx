@@ -30,7 +30,17 @@ export default function DashboardPage() {
         if (matRes.ok) {
           const matData = await matRes.json();
           console.log('[DEBUG] Materiales obtenidos:', matData.materials); // 👈
-          setMaterials(Array.isArray(matData.materials) ? matData.materials : []);
+
+          // Normalizamos aquí las propiedades de los materiales
+          const normalizedMaterials = Array.isArray(matData.materials)
+            ? matData.materials.map((m: any) => ({
+                ...m,
+                updatedBy: m.updatedby ?? m.updatedBy ?? null,
+                lastUpdated: m.lastupdated ?? m.lastUpdated ?? null,
+              }))
+            : [];
+
+          setMaterials(normalizedMaterials);
         } else {
           console.error('[ERROR] No se pudo obtener materiales');
         }
