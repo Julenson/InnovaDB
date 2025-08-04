@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { Material } from "@/lib/types";
+import { useSession } from "next-auth/react";
 
 interface Props {
   material: Material;
@@ -37,9 +38,14 @@ export function EditMaterialDialog({ material, onSave, trigger }: Props) {
   const handleSubmit = () => {
     onSave({
       id: material.id,
+      updatedBy: currentUser?.email ?? 'unknown',
+      lastUpdated: new Date().toISOString(),
       ...form,
     });
   };
+
+  const { data: session } = useSession();
+  const currentUser = session?.user;
 
   return (
     <Dialog>

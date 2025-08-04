@@ -44,7 +44,8 @@ import { EditMaterialDialog } from './edit-material-dialog';
 interface MaterialsTableProps {
   materials: Material[];
   onRemove: (id: number) => void;
-  onUpdateQuantity: (id: number, change: number) => void;
+  // Ahora onUpdateQuantity recibe el email del usuario actual para updatedBy
+  onUpdateQuantity: (id: number, change: number, updatedBy: string) => void;
   onUpdateMaterial: (material: Material) => Promise<void>;
   currentUser: User | null;
   currentUserRole: string;
@@ -107,8 +108,11 @@ export function MaterialsTable({
                           variant="outline"
                           size="icon"
                           className="h-6 w-6"
-                          onClick={() => onUpdateQuantity(material.id, -1)}
-                          disabled={material.quantity <= 0}
+                          onClick={() =>
+                            currentUser &&
+                            onUpdateQuantity(material.id, -1, currentUser.email)
+                          }
+                          disabled={material.quantity <= 0 || !currentUser}
                         >
                           <Minus className="h-4 w-4" />
                         </Button>
@@ -117,7 +121,11 @@ export function MaterialsTable({
                           variant="outline"
                           size="icon"
                           className="h-6 w-6"
-                          onClick={() => onUpdateQuantity(material.id, 1)}
+                          onClick={() =>
+                            currentUser &&
+                            onUpdateQuantity(material.id, 1, currentUser.email)
+                          }
+                          disabled={!currentUser}
                         >
                           <Plus className="h-4 w-4" />
                         </Button>
@@ -183,12 +191,12 @@ export function MaterialsTable({
 
       {/* Dialogo de edición fuera del mapa, controlado por estado */}
       {editingMaterial && (
-      <EditMaterialDialog
-         material={editingMaterial}
-         onSave={onUpdateMaterial}
-         onClose={() => setEditingMaterial(null)}
-         trigger={<div />} // 👈 trigger dummy
-      />
+        <EditMaterialDialog
+          material={editingMaterial}
+          onSave={onUpdateMaterial}
+          onClose={() => setEditingMaterial(null)}
+          trigger={<div />} // 👈 trigger dummy
+        />
       )}
     </>
   );
