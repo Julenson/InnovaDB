@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
-import { SessionProvider } from 'next-auth/react'; // ✅ Importar SessionProvider
+import { Providers } from './providers'; // ✅ Nuevo import
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -27,10 +27,10 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased">
-        <SessionProvider> {/* ✅ Envolver tu aplicación */}
+        <Providers> {/* Ahora sí puedes usar SessionProvider aquí */}
           {children}
           <Toaster />
-        </SessionProvider>
+        </Providers>
       </body>
     </html>
   );
