@@ -21,14 +21,18 @@ export default function DashboardPage() {
         const userRes = await fetch('/api/user', { headers });
         if (userRes.ok) {
           const userData = await userRes.json();
+          console.log('[DEBUG] Usuario actual:', userData); // 👈
           setCurrentUser(userData);
           setCurrentUserRole(userData.role || '');
         }
 
-        const matRes = await fetch('/api/materials', { headers });
+        const matRes = await fetch('/api/materials', { headers, cache: 'no-store' }); // 🔥 evitar caché
         if (matRes.ok) {
           const matData = await matRes.json();
+          console.log('[DEBUG] Materiales obtenidos:', matData.materials); // 👈
           setMaterials(Array.isArray(matData.materials) ? matData.materials : []);
+        } else {
+          console.error('[ERROR] No se pudo obtener materiales');
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -49,6 +53,8 @@ export default function DashboardPage() {
       lastUpdated: new Date().toISOString(),
     };
 
+    console.log('[DEBUG] Enviando nuevo material:', body); // 👈
+
     const res = await fetch(`/api/materials`, {
       method: 'POST',
       headers,
@@ -57,6 +63,7 @@ export default function DashboardPage() {
 
     if (res.ok) {
       const addedMaterial = await res.json();
+      console.log('[DEBUG] Material agregado desde backend:', addedMaterial); // 👈
       setMaterials((prev) => [...prev, addedMaterial]);
       setIsAddDialogOpen(false);
     } else {
