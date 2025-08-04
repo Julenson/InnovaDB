@@ -109,6 +109,7 @@ export default function DashboardPage() {
   }
 
   async function handleUpdateMaterial(material: Material): Promise<void> {
+    console.log('Intentando actualizar material: ', material);
     const token = localStorage.getItem('token');
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -127,7 +128,7 @@ export default function DashboardPage() {
         headers,
         body: JSON.stringify(updatedMaterial),
       });
-
+      console.log('Respuesta del servidor: ', res.status);
       if (res.ok) {
         const updated = await res.json();
         setMaterials((prev) =>
