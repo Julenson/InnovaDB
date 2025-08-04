@@ -134,12 +134,12 @@ export function MaterialsTable({
                       )}
                     </TableCell>
                     <TableCell>{material.description}</TableCell>
-                    <TableCell className="hidden md:table-cell text-right">
+                    <TableCell className="text-right">
                       {material.lastUpdated && typeof material.lastUpdated === 'string' && !isNaN(Date.parse(material.lastUpdated))
                         ? formatDistanceToNow(parseISO(material.lastUpdated), { addSuffix: true })
                         : '—'}
                     </TableCell>
-                    <TableCell className="hidden md:table-cell text-right">
+                    <TableCell className="text-right">
                       {material.updatedBy && material.updatedBy.trim() !== '' ? material.updatedBy : '—'}
                     </TableCell>
                     <TableCell>
