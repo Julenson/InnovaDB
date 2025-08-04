@@ -33,7 +33,13 @@ export function EditMaterialDialog({ material, onSave, onClose, open }: Props) {
   const currentUser = session?.user;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const value = e.target.value === '' ? null : e.target.value;
+    let value: string | number | null = e.target.value === '' ? null : e.target.value;
+
+    if(e.target.name === 'quantity'){
+      const parsed = parseInt(e.target.value, 10);
+      value = isNaN(parsed) ? 0 : parsed;
+    }
+    
     setForm({ ...form, [e.target.name]: value });
   };
 
