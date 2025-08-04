@@ -40,6 +40,7 @@ import {
 import type { Material, User } from '@/lib/types';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { EditMaterialDialog } from './edit-material-dialog';
+import { es } from 'date-fns/locale';
 
 interface MaterialsTableProps {
   materials: Material[];
@@ -136,7 +137,7 @@ export function MaterialsTable({
                   <TableCell>{material.description}</TableCell>
                   <TableCell className="text-right">
                     {material.lastUpdated && typeof material.lastUpdated === 'string' && !isNaN(Date.parse(material.lastUpdated))
-                      ? formatDistanceToNow(parseISO(material.lastUpdated), { addSuffix: true })
+                      ? formatDistanceToNow(parseISO(material.lastUpdated), { addSuffix: true, locale: es })
                       : '—'}
                   </TableCell>
                   <TableCell className="text-right">
