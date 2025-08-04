@@ -193,7 +193,7 @@ export function MaterialsTable({
           material={editingMaterial}
           onSave={onUpdateMaterial}
           onClose={() => setEditingMaterial(null)}
-          trigger={<div />}
+          open={!!editingMaterial}
         />
       )}
     </>

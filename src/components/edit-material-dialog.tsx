@@ -5,8 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogClose,
-  DialogTrigger
+  DialogClose
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,11 +17,11 @@ import { useSession } from "next-auth/react";
 interface Props {
   material: Material;
   onSave: (updated: Material) => Promise<void>;
-  trigger: React.ReactNode;
   onClose: () => void;
+  open: boolean;
 }
 
-export function EditMaterialDialog({ material, onSave, trigger }: Props) {
+export function EditMaterialDialog({ material, onSave, onClose, open }: Props) {
   const [form, setForm] = React.useState({
     name: material.name || '',
     category: material.category || '',
@@ -30,26 +29,26 @@ export function EditMaterialDialog({ material, onSave, trigger }: Props) {
     description: material.description || '',
   });
 
+  const { data: session } = useSession();
+  const currentUser = session?.user;
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const value = e.target.value === '' ? null : e.target.value;
     setForm({ ...form, [e.target.name]: value });
   };
 
-  const handleSubmit = () => {
-    onSave({
+  const handleSubmit = async () => {
+    await onSave({
       id: material.id,
       updatedBy: currentUser?.email ?? 'unknown',
       lastUpdated: new Date().toISOString(),
       ...form,
     });
+    onClose(); // cerrar después de guardar
   };
 
-  const { data: session } = useSession();
-  const currentUser = session?.user;
-
   return (
-    <Dialog>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+    <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Editar Material</DialogTitle>
