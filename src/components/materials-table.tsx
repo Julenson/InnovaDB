@@ -61,6 +61,7 @@ export function MaterialsTable({
   const canEdit = ['admin', 'owner', 'developer', 'employee'].includes(currentUserRole);
   console.log('[DEBUG] currentUserRole: ', currentUserRole, '-> canEdit: ', canEdit);
   const [editingMaterial, setEditingMaterial] = React.useState<Material | null>(null);
+  const [deletingMaterialId, setDeletingMaterialId] = React.useState<number | null>(null);
 
   return (
     <>
@@ -159,9 +160,16 @@ export function MaterialsTable({
                             >
                               <Edit2 className="h-4 w-4" /> Editar
                             </DropdownMenuItem>
-                            <AlertDialog>
+
+                            <AlertDialog
+                              open={deletingMaterialId === material.id}
+                              onOpenChange={(open) => !open && setDeletingMaterialId(null)}
+                            >
                               <AlertDialogTrigger asChild>
-                                <DropdownMenuItem className="text-destructive cursor-pointer">
+                                <DropdownMenuItem
+                                  onClick={() => setDeletingMaterialId(material.id)}
+                                  className="text-destructive cursor-pointer"
+                                >
                                   <Trash2 className="mr-2 h-4 w-4" />
                                   Eliminar
                                 </DropdownMenuItem>
@@ -173,7 +181,12 @@ export function MaterialsTable({
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
                                   <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => onRemove(material.id)}>Eliminar</AlertDialogAction>
+                                  <AlertDialogAction onClick={() => {
+                                    onRemove(material.id);
+                                    setDeletingMaterialId(null);
+                                  }}>
+                                    Eliminar
+                                  </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
                             </AlertDialog>
