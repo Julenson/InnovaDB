@@ -38,15 +38,21 @@ export default function DashboardPage() {
     fetchData();
   }, []);
 
-  async function handleAddMaterial(newMaterial: Omit<Material, 'id' | 'lastUpdated'>) {
+  async function handleAddMaterial(newMaterialData: Omit<Material, 'id' | 'lastUpdated'>) {
     const token = localStorage.getItem('token');
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
+    const body = {
+      ...newMaterialData,
+      updatedBy: currentUser?.email || 'Desconocido',
+      lastUpdated: new Date().toISOString(),
+    };
+
     const res = await fetch(`/api/materials`, {
       method: 'POST',
       headers,
-      body: JSON.stringify(newMaterial),
+      body: JSON.stringify(body),
     });
 
     if (res.ok) {
@@ -63,15 +69,7 @@ export default function DashboardPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Materiales</h1>
         <button
-          className="
-            px-4 py-2 rounded
-            border border-border
-            bg-card
-            text-foreground
-            hover:bg-muted
-            focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1
-            transition-colors duration-150
-          "
+          className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90 transition"
           onClick={() => setIsAddDialogOpen(true)}
         >
           Agregar material
@@ -82,9 +80,15 @@ export default function DashboardPage() {
         materials={materials}
         currentUser={currentUser}
         currentUserRole={currentUserRole}
-        onRemove={() => {}}
-        onUpdateQuantity={() => {}}
-        onUpdateMaterial={async () => {}}
+        onRemove={(id: number) => {
+          throw new Error('Function not implemented.');
+        }}
+        onUpdateQuantity={(id: number, change: number) => {
+          throw new Error('Function not implemented.');
+        }}
+        onUpdateMaterial={async (material: Material) => {
+          throw new Error('Function not implemented.');
+        }}
       />
 
       <AddMaterialDialog

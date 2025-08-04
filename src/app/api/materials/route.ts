@@ -1,11 +1,10 @@
-// src/app/api/materials/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllMaterials, addMaterial, updateMaterialQuantity, deleteMaterial } from '@db/managedb';
 
 export async function GET() {
   try {
     const materials = await getAllMaterials();
-    return NextResponse.json(materials);
+    return NextResponse.json({ materials }); // 🔧 Retornamos como objeto para que page.tsx lo lea bien
   } catch (error) {
     console.error('Error en getAllMaterials:', error);
     return NextResponse.json({ error: 'Error fetching materials' }, { status: 500 });
@@ -20,7 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Name and quantity are required' }, { status: 400 });
     }
 
-    const newMaterial = await addMaterial(name, quantity, category, description, updatedBy);
+    const newMaterial = await addMaterial(name, quantity, category, description, updatedBy, lastUpdated);
     return NextResponse.json(newMaterial, { status: 201 });
   } catch (error) {
     console.error('Error añadiendo material:', error);
@@ -36,8 +35,14 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'ID and quantity are required' }, { status: 400 });
     }
 
-    // Si quieres actualizar más campos, tu función updateMaterialQuantity debería soportarlo
-    const updatedMaterial = await updateMaterialQuantity(id, quantity, updatedBy);
+    const updatedMaterial = await updateMaterial({
+      id,
+      quantity,
+      updatedBy,
+      lastUpdated,
+      description,
+    });
+
     return NextResponse.json(updatedMaterial);
   } catch (error) {
     console.error('Error actualizando material:', error);

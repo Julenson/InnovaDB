@@ -101,17 +101,21 @@ export async function addMaterial(
   quantity: number,
   category: string | null,
   description: string | null,
-  updatedBy: string
+  updatedBy: string,
+  lastUpdated?: string //lo hacemos opcional
 ): Promise<Material> {
   await connectClient();
+
   const result = await client.query(
     `INSERT INTO materials (name, quantity, category, description, updatedBy, lastUpdated)
-     VALUES ($1, $2, $3, $4, $5, NOW())
+     VALUES ($1, $2, $3, $4, $5, $6)
      RETURNING id, name, quantity, category, description, updatedBy, lastUpdated`,
-    [name, quantity, category, description, updatedBy]
+    [name, quantity, category, description, updatedBy, lastUpdated || new Date().toISOString()] // ✅ default a NOW si no lo pasan
   );
+
   return result.rows[0];
 }
+
 
 // Cambié el updateMaterialQuantity para aceptar updatedBy y actualizar lastUpdated:
 export async function updateMaterialQuantity(
@@ -149,42 +153,52 @@ export async function updateMaterialCategory(id: number, category: string): Prom
   return result.rows[0];
 }
 
-export async function updateMaterial(
-  id: number,
-  name: string | null,
-  category: string | null,
-  quantity: number | null,
-  description: string | null,
-  updatedBy: string
-): Promise<Material> {
+type UpdateMaterialArgs = {
+  id: number;
+  name?: string | null;
+  category?: string | null;
+  quantity?: number | null;
+  description?: string | null;
+  updatedBy: string;
+  lastUpdated?: string;
+};
+
+export async function updateMaterial({
+  id,
+  name,
+  category,
+  quantity,
+  description,
+  updatedBy,
+  lastUpdated,
+}: UpdateMaterialArgs): Promise<Material> {
   await connectClient();
   const fields = [];
   const values = [];
 
-  if (name !== null) {
+  if (name !== undefined && name !== null) {
     fields.push(`name = $${fields.length + 1}`);
     values.push(name);
   }
-  if (category !== null) {
+  if (category !== undefined && category !== null) {
     fields.push(`category = $${fields.length + 1}`);
     values.push(category);
   }
-  if (quantity !== null) {
+  if (quantity !== undefined && quantity !== null) {
     fields.push(`quantity = $${fields.length + 1}`);
     values.push(quantity);
   }
-  if (description !== null) {
+  if (description !== undefined && description !== null) {
     fields.push(`description = $${fields.length + 1}`);
     values.push(description);
   }
 
-  // Añadimos updatedBy y lastUpdated
   fields.push(`updatedBy = $${fields.length + 1}`);
   values.push(updatedBy);
 
-  fields.push('lastUpdated = NOW()');
+  fields.push(`lastUpdated = $${fields.length + 1}`);
+  values.push(lastUpdated || new Date().toISOString());
 
-  // Finalmente el id para el WHERE
   const query = `UPDATE materials SET ${fields.join(', ')} WHERE id = $${values.length + 1} RETURNING *`;
   values.push(id);
 
