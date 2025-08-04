@@ -70,7 +70,7 @@ export function EditMaterialDialog({ material, onSave, onClose, open }: Props) {
             <Input name="name" value={form.name} onChange={handleChange} />
           </div>
           <div>
-            <Label>Categoría</Label>
+            <Label>Ud. Medición</Label>
             <Input name="category" value={form.category} onChange={handleChange} />
           </div>
           <div>

@@ -10,6 +10,7 @@ export default function DashboardPage() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [currentUserRole, setCurrentUserRole] = useState<string>('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(''); // 🔍 nuevo estado para búsqueda
 
   useEffect(() => {
     async function fetchData() {
@@ -47,6 +48,18 @@ export default function DashboardPage() {
 
     fetchData();
   }, []);
+
+  // 🔍 Filtrar materiales por búsqueda
+  const filteredMaterials = materials.filter((material) => {
+    const term = searchTerm.toLowerCase();
+    return (
+      material.name.toLowerCase().includes(term) ||
+      material.category?.toLowerCase().includes(term) ||
+      material.description?.toLowerCase().includes(term) ||
+      material.updatedBy?.toLowerCase().includes(term) ||
+      material.quantity.toString().includes(term)
+    );
+  });
 
   async function handleRemove(id: number) {
     const token = localStorage.getItem('token');
@@ -98,7 +111,16 @@ export default function DashboardPage() {
       if (res.ok) {
         const updated = await res.json();
         setMaterials((prev) =>
-          prev.map((m) => (m.id === id ? { ...m, quantity: updated.quantity, updatedBy: updated.updatedBy, lastUpdated: updated.lastUpdated } : m))
+          prev.map((m) =>
+            m.id === id
+              ? {
+                  ...m,
+                  quantity: updated.quantity,
+                  updatedBy: updated.updatedBy,
+                  lastUpdated: updated.lastUpdated,
+                }
+              : m
+          )
         );
       } else {
         console.error('Error actualizando cantidad');
@@ -113,14 +135,14 @@ export default function DashboardPage() {
     const token = localStorage.getItem('token');
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
-      const updatedMaterial = {
-        id: material.id,
-        name: material.name,
-        quantity: material.quantity,
-        category: material.category,
-        description: material.description,
-        updatedBy: currentUser?.email || 'Desconocido',
-        lastUpdated: new Date().toISOString(),
+    const updatedMaterial = {
+      id: material.id,
+      name: material.name,
+      quantity: material.quantity,
+      category: material.category,
+      description: material.description,
+      updatedBy: currentUser?.email || 'Desconocido',
+      lastUpdated: new Date().toISOString(),
     };
 
     try {
@@ -142,7 +164,6 @@ export default function DashboardPage() {
       console.error('Error actualizando material:', error);
     }
   }
-
 
   async function handleAddMaterial(newMaterialData: Omit<Material, 'id' | 'lastUpdated'>) {
     const token = localStorage.getItem('token');
@@ -182,8 +203,19 @@ export default function DashboardPage() {
         </button>
       </div>
 
+      {/* 🔍 Campo de búsqueda */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Buscar por nombre, unidad, cantidad, descripción o actualizado por..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded"
+        />
+      </div>
+
       <MaterialsTable
-        materials={materials}
+        materials={filteredMaterials}
         currentUser={currentUser}
         currentUserRole={currentUserRole}
         onRemove={handleRemove}
