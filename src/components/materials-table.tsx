@@ -59,6 +59,7 @@ export function MaterialsTable({
   currentUserRole,
 }: MaterialsTableProps) {
   const canEdit = ['admin', 'owner', 'developer', 'employee'].includes(currentUserRole);
+  console.log('[DEBUG] currentUserRole: ', currentUserRole, '-> canEdit: ', canEdit);
   const [editingMaterial, setEditingMaterial] = React.useState<Material | null>(null);
 
   return (
