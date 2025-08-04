@@ -23,7 +23,6 @@ export default function DashboardPage() {
           const userData = await userRes.json();
           setCurrentUser(userData);
           setCurrentUserRole((userData.category || '').toLowerCase());
-          console.log('[DEBUG] currentUserRole (category): ', userData.category);
         }
 
         const matRes = await fetch('/api/materials', { headers, cache: 'no-store' });
@@ -55,9 +54,10 @@ export default function DashboardPage() {
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
     try {
-      const res = await fetch(`/api/materials/${id}`, {
+      const res = await fetch(`/api/materials`, {
         method: 'DELETE',
         headers,
+        body: JSON.stringify({ id }),
       });
 
       if (res.ok) {
@@ -78,7 +78,7 @@ export default function DashboardPage() {
     if (newQuantity < 0) return;
 
     const updatedMaterial = {
-      ...material,
+      id,
       quantity: newQuantity,
       updatedBy,
       lastUpdated: new Date().toISOString(),
@@ -89,7 +89,7 @@ export default function DashboardPage() {
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
     try {
-      const res = await fetch(`/api/materials/${id}`, {
+      const res = await fetch(`/api/materials`, {
         method: 'PUT',
         headers,
         body: JSON.stringify(updatedMaterial),
@@ -98,7 +98,7 @@ export default function DashboardPage() {
       if (res.ok) {
         const updated = await res.json();
         setMaterials((prev) =>
-          prev.map((m) => (m.id === id ? updated : m))
+          prev.map((m) => (m.id === id ? { ...m, quantity: updated.quantity, updatedBy: updated.updatedBy, lastUpdated: updated.lastUpdated } : m))
         );
       } else {
         console.error('Error actualizando cantidad');
@@ -114,22 +114,24 @@ export default function DashboardPage() {
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
     const updatedMaterial = {
-      ...material,
+      id: material.id,
+      quantity: material.quantity,
+      description: material.description,
       updatedBy: currentUser?.email || 'Desconocido',
       lastUpdated: new Date().toISOString(),
     };
 
     try {
-      const res = await fetch(`/api/materials/${material.id}`, {
+      const res = await fetch(`/api/materials`, {
         method: 'PUT',
         headers,
         body: JSON.stringify(updatedMaterial),
       });
 
       if (res.ok) {
-        const updated = await res.json(); // Usamos lo que devuelve el backend
+        const updated = await res.json();
         setMaterials((prev) =>
-          prev.map((m) => (m.id === material.id ? updated : m))
+          prev.map((m) => (m.id === material.id ? { ...m, ...updated } : m))
         );
       } else {
         console.error('Error actualizando material');
