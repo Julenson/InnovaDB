@@ -21,17 +21,13 @@ export default function DashboardPage() {
         const userRes = await fetch('/api/user', { headers });
         if (userRes.ok) {
           const userData = await userRes.json();
-          console.log('[DEBUG] Usuario actual:', userData); // 👈
           setCurrentUser(userData);
           setCurrentUserRole(userData.role || '');
         }
 
-        const matRes = await fetch('/api/materials', { headers, cache: 'no-store' }); // 🔥 evitar caché
+        const matRes = await fetch('/api/materials', { headers, cache: 'no-store' });
         if (matRes.ok) {
           const matData = await matRes.json();
-          console.log('[DEBUG] Materiales obtenidos:', matData.materials); // 👈
-
-          // Normalizamos aquí las propiedades de los materiales
           const normalizedMaterials = Array.isArray(matData.materials)
             ? matData.materials.map((m: any) => ({
                 ...m,
@@ -42,7 +38,7 @@ export default function DashboardPage() {
 
           setMaterials(normalizedMaterials);
         } else {
-          console.error('[ERROR] No se pudo obtener materiales');
+          console.error('No se pudo obtener materiales');
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -51,6 +47,97 @@ export default function DashboardPage() {
 
     fetchData();
   }, []);
+
+  // Eliminar material
+  async function handleRemove(id: number) {
+    const token = localStorage.getItem('token');
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    try {
+      const res = await fetch(`/api/materials/${id}`, {
+        method: 'DELETE',
+        headers,
+      });
+
+      if (res.ok) {
+        setMaterials((prev) => prev.filter((m) => m.id !== id));
+      } else {
+        console.error('Error eliminando material');
+      }
+    } catch (error) {
+      console.error('Error eliminando material:', error);
+    }
+  }
+
+  // Actualizar cantidad
+  async function handleUpdateQuantity(id: number, change: number, updatedBy: string) {
+    const material = materials.find((m) => m.id === id);
+    if (!material) return;
+
+    const newQuantity = material.quantity + change;
+    if (newQuantity < 0) return;
+
+    const updatedMaterial = {
+      ...material,
+      quantity: newQuantity,
+      updatedBy,
+      lastUpdated: new Date().toISOString(),
+    };
+
+    const token = localStorage.getItem('token');
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    try {
+      const res = await fetch(`/api/materials/${id}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(updatedMaterial),
+      });
+
+      if (res.ok) {
+        setMaterials((prev) =>
+          prev.map((m) => (m.id === id ? updatedMaterial : m))
+        );
+      } else {
+        console.error('Error actualizando cantidad');
+      }
+    } catch (error) {
+      console.error('Error actualizando cantidad:', error);
+    }
+  }
+
+  // Actualizar material (edición completa)
+  async function handleUpdateMaterial(material: Material): Promise<void> {
+    const token = localStorage.getItem('token');
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const updatedMaterial = {
+      ...material,
+      updatedBy: currentUser?.email || 'Desconocido',
+      lastUpdated: new Date().toISOString(),
+    };
+
+    try {
+      const res = await fetch(`/api/materials/${material.id}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(updatedMaterial),
+      });
+
+      if (res.ok) {
+        setMaterials((prev) =>
+          prev.map((m) => (m.id === material.id ? updatedMaterial : m))
+        ); // para que el diálogo se cierre
+      } else {
+        console.error('Error actualizando material');
+      }
+    } catch (error) {
+      console.error('Error actualizando material:', error);
+    }
+  }
 
   async function handleAddMaterial(newMaterialData: Omit<Material, 'id' | 'lastUpdated'>) {
     const token = localStorage.getItem('token');
@@ -63,8 +150,6 @@ export default function DashboardPage() {
       lastUpdated: new Date().toISOString(),
     };
 
-    console.log('[DEBUG] Enviando nuevo material:', body); // 👈
-
     const res = await fetch(`/api/materials`, {
       method: 'POST',
       headers,
@@ -73,7 +158,6 @@ export default function DashboardPage() {
 
     if (res.ok) {
       const addedMaterial = await res.json();
-      console.log('[DEBUG] Material agregado desde backend:', addedMaterial); // 👈
       setMaterials((prev) => [...prev, addedMaterial]);
       setIsAddDialogOpen(false);
     } else {
@@ -97,15 +181,9 @@ export default function DashboardPage() {
         materials={materials}
         currentUser={currentUser}
         currentUserRole={currentUserRole}
-        onRemove={(id: number) => {
-          throw new Error('Function not implemented.');
-        }}
-        onUpdateQuantity={(id: number, change: number) => {
-          throw new Error('Function not implemented.');
-        }}
-        onUpdateMaterial={async (material: Material) => {
-          throw new Error('Function not implemented.');
-        }}
+        onRemove={handleRemove}
+        onUpdateQuantity={handleUpdateQuantity}
+        onUpdateMaterial={handleUpdateMaterial}
       />
 
       <AddMaterialDialog
