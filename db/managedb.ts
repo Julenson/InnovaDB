@@ -43,10 +43,10 @@ export async function getAllMaterials(): Promise<Material[]> {
   await connectClient();
   try {
     const result = await client.query('SELECT id, name, quantity, category, description, updatedBy, lastUpdated FROM materials');
-    console.log('🧪 getAllMaterials:', result.rows);
+    console.log('getAllMaterials:', result.rows);
     return result.rows as Material[];
   } catch (error) {
-    console.error('❌ Error en getAllMaterials:', error);
+    console.error('Error en getAllMaterials:', error);
     throw error;
   }
 }

@@ -33,14 +33,9 @@ export function EditMaterialDialog({ material, onSave, onClose, open }: Props) {
   const currentUser = session?.user;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    let value: string | number | null = e.target.value === '' ? null : e.target.value;
-
-    if(e.target.name === 'quantity'){
-      const parsed = parseInt(e.target.value, 10);
-      value = isNaN(parsed) ? 0 : parsed;
-    }
-    
-    setForm({ ...form, [e.target.name]: value });
+    const { name, value } = e.target;
+    const parsedValue = name ==='quantity' ? parseInt(value, 10) || 0 : value;
+    setForm((prev) => ({ ...prev, [name]: parsedValue }));
   };
 
   const handleSubmit = async () => {

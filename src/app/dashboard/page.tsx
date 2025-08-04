@@ -49,7 +49,6 @@ export default function DashboardPage() {
     fetchData();
   }, []);
 
-  // Eliminar material
   async function handleRemove(id: number) {
     const token = localStorage.getItem('token');
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -71,7 +70,6 @@ export default function DashboardPage() {
     }
   }
 
-  // Actualizar cantidad
   async function handleUpdateQuantity(id: number, change: number, updatedBy: string) {
     const material = materials.find((m) => m.id === id);
     if (!material) return;
@@ -98,8 +96,9 @@ export default function DashboardPage() {
       });
 
       if (res.ok) {
+        const updated = await res.json();
         setMaterials((prev) =>
-          prev.map((m) => (m.id === id ? updatedMaterial : m))
+          prev.map((m) => (m.id === id ? updated : m))
         );
       } else {
         console.error('Error actualizando cantidad');
@@ -109,7 +108,6 @@ export default function DashboardPage() {
     }
   }
 
-  // Actualizar material (edición completa)
   async function handleUpdateMaterial(material: Material): Promise<void> {
     const token = localStorage.getItem('token');
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -129,9 +127,10 @@ export default function DashboardPage() {
       });
 
       if (res.ok) {
+        const updated = await res.json(); // Usamos lo que devuelve el backend
         setMaterials((prev) =>
-          prev.map((m) => (m.id === material.id ? updatedMaterial : m))
-        ); // para que el diálogo se cierre
+          prev.map((m) => (m.id === material.id ? updated : m))
+        );
       } else {
         console.error('Error actualizando material');
       }
