@@ -4,13 +4,14 @@ import React, { useEffect, useState } from 'react';
 import { MaterialsTable } from '@/components/materials-table';
 import type { User, Material } from '@/lib/types';
 import { AddMaterialDialog } from '@/components/add-material-dialog';
+import { InnovaSportLogo } from '@/components/icons';
 
 export default function DashboardPage() {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [currentUserRole, setCurrentUserRole] = useState<string>('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState(''); // 🔍 nuevo estado para búsqueda
+  const [searchTerm, setSearchTerm] = useState(''); 
 
   useEffect(() => {
     async function fetchData() {
@@ -49,7 +50,6 @@ export default function DashboardPage() {
     fetchData();
   }, []);
 
-  // 🔍 Filtrar materiales por búsqueda
   const filteredMaterials = materials.filter((material) => {
     const term = searchTerm.toLowerCase();
     return (
@@ -194,7 +194,10 @@ export default function DashboardPage() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Materiales</h1>
+        <div className="flex items-center gap-3">
+          <InnovaSportLogo className="h-10 w-10" />
+          <h1 className="text-3xl font-bold">Materiales</h1>
+        </div>
         <button
           className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90 transition"
           onClick={() => setIsAddDialogOpen(true)}

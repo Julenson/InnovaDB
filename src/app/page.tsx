@@ -13,7 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Mail, Lock } from 'lucide-react';
-import { InnovaSportLogo } from '@/components/icons';
+import Image from 'next/image'; 
 
 export default function LoginPage() {
   const router = useRouter();
@@ -42,11 +42,7 @@ export default function LoginPage() {
       }
 
       const data = await res.json();
-
-      // Guardamos el token JWT en localStorage
       localStorage.setItem('token', data.token);
-
-      // Redirigimos al dashboard
       router.push('/dashboard');
     } catch {
       setError('Error en la conexión');
@@ -57,7 +53,15 @@ export default function LoginPage() {
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
       <div className="hidden bg-primary lg:flex lg:flex-col lg:items-center lg:justify-center lg:p-10">
         <div className="flex items-center text-primary-foreground">
-          <InnovaSportLogo className="h-24 w-24" />
+          {/* Nuevo logo usando imagen en /public */}
+          <Image
+            src="/logo.png"
+            alt="Innova-Sport Logo"
+            width={96}
+            height={96}
+            className="h-24 w-24"
+            priority
+          />
         </div>
         <div className="mt-6 text-center">
           <h1 className="text-4xl font-bold text-primary-foreground tracking-tighter">
@@ -71,6 +75,7 @@ export default function LoginPage() {
           &copy; 2024 Innova-Sport. All Rights Reserved.
         </p>
       </div>
+
       <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto grid w-[350px] gap-6">
           <div className="grid gap-2 text-center">
