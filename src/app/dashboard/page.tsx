@@ -195,7 +195,7 @@ export default function DashboardPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-3">
-          <InnovaSportLogo className="h-10 w-10" />
+          <InnovaSportLogo className="w-32 h-auto" />
           <h1 className="text-3xl font-bold">Materiales</h1>
         </div>
         <button

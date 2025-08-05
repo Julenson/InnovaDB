@@ -25,7 +25,7 @@ export default function LoginPage() {
 
     const form = e.currentTarget as HTMLFormElement;
     const formData = new FormData(form);
-    const email = formData.get('email') as string;
+    const email = (formData.get('email') as string).toLowerCase();
     const password = formData.get('password') as string;
 
     try {
@@ -57,16 +57,13 @@ export default function LoginPage() {
           <Image
             src="/logo.png"
             alt="Innova-Sport Logo"
-            width={96}
-            height={96}
-            className="h-24 w-24"
+            width={160}
+            height={82}
+            className="object-contain"
             priority
           />
         </div>
         <div className="mt-6 text-center">
-          <h1 className="text-4xl font-bold text-primary-foreground tracking-tighter">
-            Innova-Sport
-          </h1>
           <p className="mt-2 text-lg text-primary-foreground/80">
             Manejo de Inventario
           </p>
