@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
   title: 'Innova Sport - Base de Datos',
-  description: 'Smart inventory management and reorder prediction for Innova-Sport.',
+  description: 'Manejo de las bases de datos de la empresa Innova-Sport',
 };
 
 export default function RootLayout({
