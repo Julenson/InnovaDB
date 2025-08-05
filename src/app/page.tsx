@@ -88,7 +88,6 @@ export default function LoginPage() {
                 type="email"
                 placeholder="m@example.com"
                 required
-                defaultValue="demo@innovasport.com"
               />
             </div>
             <div className="grid gap-2">
@@ -100,7 +99,6 @@ export default function LoginPage() {
                 name="password"
                 type="password"
                 required
-                defaultValue="demoinnovasport"
               />
             </div>
             {error && (
