@@ -62,26 +62,25 @@ export default function DashboardPage() {
   });
 
   async function handleRemove(id: number) {
-    const token = localStorage.getItem('token');
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+  try {
+    const res = await fetch('/api/materials', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id }),
+    });
 
-    try {
-      const res = await fetch(`/api/materials`, {
-        method: 'DELETE',
-        headers,
-        body: JSON.stringify({ id }),
-      });
-
-      if (res.ok) {
-        setMaterials((prev) => prev.filter((m) => m.id !== id));
-      } else {
-        console.error('Error eliminando material');
-      }
-    } catch (error) {
-      console.error('Error eliminando material:', error);
+    if (res.ok) {
+      setMaterials((prev) => prev.filter((m) => m.id !== id));
+    } else {
+      console.error('Error al eliminar el material');
     }
+  } catch (error) {
+    console.error('Error en handleRemove:', error);
   }
+}
+
 
   async function handleUpdateQuantity(id: number, change: number, updatedBy: string) {
     const material = materials.find((m) => m.id === id);

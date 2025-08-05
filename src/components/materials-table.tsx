@@ -150,7 +150,7 @@ export function MaterialsTable({
                         onOpenChange={(open) => {
                           if (open) {
                             setMenuOpenFor(material.id);
-                            setDeletingMaterialId(null); // limpiar diálogo eliminar al abrir menú
+                            setDeletingMaterialId(null); 
                           } else {
                             setMenuOpenFor(null);
                           }
