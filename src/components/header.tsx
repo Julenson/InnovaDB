@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -26,19 +25,13 @@ export default function Header() {
   
   return (
     <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 z-50">
-      <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
+      <nav className="hidden md:flex md:items-center">
         <Link
           href="/dashboard"
-          className="flex items-center gap-2 text-lg font-semibold md:text-base"
+          className="flex items-center"
+          aria-label="Innova-Sport"
         >
-          <InnovaSportLogo className="h-8 w-8 text-primary" />
-          <span className="sr-only">Innova-Sport</span>
-        </Link>
-        <Link
-          href="/dashboard"
-          className="text-foreground transition-colors hover:text-foreground font-bold text-lg"
-        >
-          Innova-Sport
+          <InnovaSportLogo className="h-8 w-[63px] text-primary" />
         </Link>
       </nav>
       {/* Mobile menu can be added here if needed */}
@@ -63,7 +56,7 @@ export default function Header() {
             <DropdownMenuItem disabled>
               <LifeBuoy className="mr-2 h-4 w-4" />
               <span>Ayuda</span>
-              </DropdownMenuItem>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => router.push('/')}>
               <LogOut className="mr-2 h-4 w-4" />
