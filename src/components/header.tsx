@@ -22,9 +22,9 @@ import { InnovaSportLogo } from './icons';
 
 export default function Header() {
   const router = useRouter();
-  
+
   return (
-    <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 z-50">
+    <header className="sticky top-0 flex h-16 items-center border-b bg-background px-4 md:px-6 z-50">
       <nav className="hidden md:flex md:items-center">
         <Link
           href="/dashboard"
@@ -34,16 +34,16 @@ export default function Header() {
           <InnovaSportLogo className="h-8 w-[63px] text-primary" />
         </Link>
       </nav>
-      {/* Mobile menu can be added here if needed */}
-      <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
-        <div className="ml-auto flex-1 sm:flex-initial">
-          {/* Search can be added here */}
-        </div>
+
+      {/* Espacio flexible que empuja el menú usuario a la derecha */}
+      <div className="flex-grow" />
+
+      <div className="flex items-center gap-4 md:gap-2 lg:gap-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full">
               <User className="h-5 w-5" />
-              <span className="sr-only">Menu Alternado de Usuario</span>
+              <span className="sr-only">Menú de usuario</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -60,7 +60,7 @@ export default function Header() {
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => router.push('/')}>
               <LogOut className="mr-2 h-4 w-4" />
-              <span>Cerrar Sesion</span>
+              <span>Cerrar Sesión</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
