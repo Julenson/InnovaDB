@@ -7,7 +7,7 @@ import { Providers } from './providers'; // ✅ Nuevo import
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'InnovaTrack - Inventory Management',
+  title: 'Innova Sport - Base de Datos',
   description: 'Smart inventory management and reorder prediction for Innova-Sport.',
 };
 
