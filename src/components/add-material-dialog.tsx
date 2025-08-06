@@ -75,13 +75,15 @@ export function AddMaterialDialog({ trigger, open, onOpenChange, onAdd }: AddMat
             <input
               id="quantity"
               type="number"
+              step="0.01"
               {...register('quantity', {
                 required: 'La cantidad es obligatoria',
                 valueAsNumber: true,
+                min: { value: 0, message: 'Cantidad mínima 0' },
                 validate: (value) => {
-                  const decimalPart = value.toString().split('.')[1]
-                  return !decimalPart || decimalPart.length <= 2 || 'Máximo 2 decimales permitidos';
-                }
+                  const decimals = value.toString().split('.')[1];
+                  return !decimals || decimals.length <= 2 || 'Máximo 2 decimales permitidos';
+                },
               })}
               className="mt-2 block w-full rounded-md border border-border bg-card px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
             />

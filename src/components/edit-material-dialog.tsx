@@ -75,7 +75,7 @@ export function EditMaterialDialog({ material, onSave, onClose, open }: Props) {
           </div>
           <div>
             <Label>Cantidad</Label>
-            <Input name="quantity" type="number" value={form.quantity} onChange={handleChange} />
+            <Input name="quantity" type="number" step="0.01" value={form.quantity} onChange={handleChange} />
           </div>
           <div>
             <Label>Descripción</Label>
