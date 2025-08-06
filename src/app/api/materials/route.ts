@@ -1,7 +1,7 @@
 // src/app/api/materials/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllMaterials, addMaterial, updateMaterial } from '@db/managedb';
+import { getAllMaterials, addMaterial, updateMaterial, deleteMaterial } from '@db/managedb';
 
 export async function GET() {
   try {
@@ -54,3 +54,19 @@ export async function PUT(request: NextRequest) {
   }
 }
 
+export async function DELETE(request: Request) {
+  try {
+    const { id } = await request.json();
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    }
+
+    await deleteMaterial(Number(id));
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error al eliminar material:', error);
+    return NextResponse.json({ error: 'Error al eliminar' }, { status: 500 });
+  }
+}
