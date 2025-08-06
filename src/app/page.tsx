@@ -61,10 +61,10 @@ export default function LoginPage() {
             Manejo de Inventario
           </p>
         </div>
-          <p className="mt-auto text-sm text-primary-foreground/60">
-            &copy; 2024 Innova-Sport. All Rights Reserved.
-          </p>
-    </div>
+        <p className="mt-auto text-sm text-primary-foreground/60">
+          &copy; 2024 Innova-Sport. All Rights Reserved.
+        </p>
+      </div>
 
       <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto grid w-[350px] gap-6">

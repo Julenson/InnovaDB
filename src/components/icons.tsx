@@ -8,6 +8,14 @@ interface LogoProps {
   className?: string;
 }
 
-export function InnovaSportLogo({ width = 40, height = 40, className = '' }: LogoProps) {
-  return <LogoSvg width={width} height={height} className={className} aria-label="Innova Sport Logo" />;
+export function InnovaSportLogo({ className = '' }: { className?: string }) {
+  return (
+    <LogoSvg
+      className={`${className} max-w-[180px] max-h-[90px] w-auto h-auto block`}
+      aria-label="Innova Sport Logo"
+      style={{ overflow: 'visible' }}
+    />
+  );
 }
+
+
