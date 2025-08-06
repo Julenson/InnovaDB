@@ -51,6 +51,11 @@ interface MaterialsTableProps {
   currentUserRole: string;
 }
 
+function formatQuantity(qty: number | string) {
+  const n = Number(qty);
+  return Number.isInteger(n) ? n.toString() : n.toFixed(2);
+}
+
 export function MaterialsTable({
   materials,
   onRemove,
@@ -116,9 +121,7 @@ export function MaterialsTable({
                         >
                           <Minus className="h-4 w-4" />
                         </Button>
-                        <span>{Number(material.quantity) % 1 === 0
-                          ? material.quantity.toString()
-                          : material.quantity.toFixed(2)}</span>
+                        <span>{formatQuantity(material.quantity)}</span>
                         <Button
                           variant="outline"
                           size="icon"
@@ -133,7 +136,7 @@ export function MaterialsTable({
                         </Button>
                       </div>
                     ) : (
-                      material.quantity.toFixed(2)
+                      <span>{formatQuantity(material.quantity)}</span>
                     )}
                   </TableCell>
                   <TableCell>{material.description}</TableCell>
@@ -168,7 +171,7 @@ export function MaterialsTable({
                           <DropdownMenuItem
                             onClick={() => {
                               setEditingMaterial(material);
-                              setMenuOpenFor(null); // cerrar menú al editar
+                              setMenuOpenFor(null);
                             }}
                             className="cursor-pointer flex items-center gap-2"
                           >
@@ -180,10 +183,9 @@ export function MaterialsTable({
                             onOpenChange={(open) => !open && setDeletingMaterialId(null)}
                           >
                             <AlertDialogTrigger asChild>
-                              {/* Aquí usamos un div que evita cerrar el menú */}
                               <div
                                 onClick={(e) => {
-                                  e.stopPropagation(); // evita cerrar menú
+                                  e.stopPropagation();
                                   setDeletingMaterialId(material.id);
                                 }}
                                 className="text-destructive cursor-pointer flex items-center gap-2 px-3 py-2"
