@@ -93,7 +93,7 @@ export function AddMaterialDialog({ trigger, open, onOpenChange, onAdd }: AddMat
             </label>
             <input
               id="description"
-              {...register('description', { required: 'La descripción es obligatoria' })}
+              {...register('description')} {/* ← aquí ya no es obligatorio */}
               className="mt-2 block w-full rounded-md border border-border bg-card px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
             />
             {errors.description && (
