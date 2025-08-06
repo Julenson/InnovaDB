@@ -12,8 +12,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Lock } from 'lucide-react';
-import Logo from '../public/logo.svg';
+import Logo from '@/assets/logo.svg';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -53,8 +52,8 @@ export default function LoginPage() {
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
       <div className="hidden bg-primary lg:flex lg:flex-col lg:items-center lg:justify-center lg:p-10">
         <div className="flex items-center text-primary-foreground">
-          {/* Nuevo logo usando imagen en /public */}
-          <Logo width={160} height={82} className="object-contain" />
+          {/* Logo SVG importado como componente React */}
+          <Logo width={160} height={82} aria-label="Logo Innova-Sport" />
         </div>
         <div className="mt-6 text-center">
           <p className="mt-2 text-lg text-primary-foreground/80">
@@ -86,9 +85,7 @@ export default function LoginPage() {
               />
             </div>
             <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-              </div>
+              <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 name="password"
