@@ -9,7 +9,6 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import {
   DropdownMenu,
@@ -45,7 +44,11 @@ import { es } from 'date-fns/locale';
 interface MaterialsTableProps {
   materials: Material[];
   onRemove: (id: number) => void;
-  onUpdateQuantity: (id: number, change: number, updatedBy: string) => void;
+  onUpdateQuantity: (
+    id: number,
+    change: number,
+    updatedBy: string
+  ) => Promise<'ok' | 'zero' | 'error'>;
   onUpdateMaterial: (material: Material) => Promise<void>;
   currentUser: User | null;
   currentUserRole: string;
@@ -68,6 +71,25 @@ export function MaterialsTable({
   const [editingMaterial, setEditingMaterial] = React.useState<Material | null>(null);
   const [deletingMaterialId, setDeletingMaterialId] = React.useState<number | null>(null);
   const [menuOpenFor, setMenuOpenFor] = React.useState<number | null>(null);
+
+  // Función para restar cantidad con control de cantidad cero
+  const handleSubtract = async (material: Material) => {
+    if (!currentUser) return;
+
+    // Restar 1 (entero)
+    const result = await onUpdateQuantity(material.id, -1, currentUser.email);
+
+    if (result === 'zero') {
+      // Si llega a cero, mostrar diálogo de confirmación para eliminar
+      setDeletingMaterialId(material.id);
+    }
+  };
+
+  // Función para sumar cantidad (entero)
+  const handleAdd = async (material: Material) => {
+    if (!currentUser) return;
+    await onUpdateQuantity(material.id, 1, currentUser.email);
+  };
 
   return (
     <>
@@ -112,11 +134,9 @@ export function MaterialsTable({
                           variant="outline"
                           size="icon"
                           className="h-6 w-6"
-                          onClick={() =>
-                            currentUser &&
-                            onUpdateQuantity(material.id, -1, currentUser.email)
-                          }
+                          onClick={() => handleSubtract(material)}
                           disabled={material.quantity <= 0 || !currentUser}
+                          aria-label={`Restar cantidad de ${material.name}`}
                         >
                           <Minus className="h-4 w-4" />
                         </Button>
@@ -125,11 +145,9 @@ export function MaterialsTable({
                           variant="outline"
                           size="icon"
                           className="h-6 w-6"
-                          onClick={() =>
-                            currentUser &&
-                            onUpdateQuantity(material.id, 1, currentUser.email)
-                          }
+                          onClick={() => handleAdd(material)}
                           disabled={!currentUser}
+                          aria-label={`Sumar cantidad de ${material.name}`}
                         >
                           <Plus className="h-4 w-4" />
                         </Button>
@@ -154,14 +172,14 @@ export function MaterialsTable({
                         onOpenChange={(open) => {
                           if (open) {
                             setMenuOpenFor(material.id);
-                            setDeletingMaterialId(null); 
+                            setDeletingMaterialId(null);
                           } else {
                             setMenuOpenFor(null);
                           }
                         }}
                       >
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
+                          <Button variant="ghost" className="h-8 w-8 p-0" aria-label={`Abrir menú de acciones para ${material.name}`}>
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -196,6 +214,7 @@ export function MaterialsTable({
                                     setDeletingMaterialId(material.id);
                                   }
                                 }}
+                                aria-label={`Eliminar material ${material.name}`}
                               >
                                 <Trash2 className="mr-2 h-4 w-4" />
                                 Eliminar

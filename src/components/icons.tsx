@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import LogoSvg from '@/public/logo.svg';
 
 interface LogoProps {
   width?: number;
@@ -9,14 +9,5 @@ interface LogoProps {
 }
 
 export function InnovaSportLogo({ width = 40, height = 40, className = '' }: LogoProps) {
-  return (
-    <Image
-      src="/logo.png"
-      alt="Innova Sport Logo"
-      width={width}
-      height={height}
-      className={className}
-      priority
-    />
-  );
+  return <LogoSvg width={width} height={height} className={className} aria-label="Innova Sport Logo" />;
 }

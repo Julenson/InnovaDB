@@ -4,14 +4,16 @@ import React, { useEffect, useState } from 'react';
 import { MaterialsTable } from '@/components/materials-table';
 import type { User, Material } from '@/lib/types';
 import { AddMaterialDialog } from '@/components/add-material-dialog';
-import { InnovaSportLogo } from '@/components/icons';
 
 export default function DashboardPage() {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [currentUserRole, setCurrentUserRole] = useState<string>('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState(''); 
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const [pendingAddMaterial, setPendingAddMaterial] = useState<Omit<Material, 'id' | 'lastUpdated'> | null>(null);
+  const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -51,45 +53,48 @@ export default function DashboardPage() {
   }, []);
 
   const filteredMaterials = materials
-  .filter((material) => {
-    const term = searchTerm.toLowerCase();
-    return (
-      material.name.toLowerCase().includes(term) ||
-      material.category?.toLowerCase().includes(term) ||
-      material.description?.toLowerCase().includes(term) ||
-      material.updatedBy?.toLowerCase().includes(term) ||
-      material.quantity.toString().includes(term)
-    );
-  })
-  .sort((a, b) => a.name.localeCompare(b.name));
+    .filter((material) => {
+      const term = searchTerm.toLowerCase();
+      return (
+        material.name.toLowerCase().includes(term) ||
+        material.category?.toLowerCase().includes(term) ||
+        material.description?.toLowerCase().includes(term) ||
+        material.updatedBy?.toLowerCase().includes(term) ||
+        material.quantity.toString().includes(term)
+      );
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   async function handleRemove(id: number) {
-  try {
-    const res = await fetch('/api/materials', {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ id }),
-    });
+    try {
+      const res = await fetch('/api/materials', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id }),
+      });
 
-    if (res.ok) {
-      setMaterials((prev) => prev.filter((m) => m.id !== id));
-    } else {
-      console.error('Error al eliminar el material');
+      if (res.ok) {
+        setMaterials((prev) => prev.filter((m) => m.id !== id));
+      } else {
+        console.error('Error al eliminar el material');
+      }
+    } catch (error) {
+      console.error('Error en handleRemove:', error);
     }
-  } catch (error) {
-    console.error('Error en handleRemove:', error);
   }
-}
 
-
-  async function handleUpdateQuantity(id: number, change: number, updatedBy: string) {
+  async function handleUpdateQuantity(
+    id: number,
+    change: number,
+    updatedBy: string
+  ): Promise<'ok' | 'zero' | 'error'> {
     const material = materials.find((m) => m.id === id);
-    if (!material) return;
+    if (!material) return 'error';
 
     const newQuantity = material.quantity + change;
-    if (newQuantity < 0) return;
+    if (newQuantity < 0) return 'error';
 
     const updatedMaterial = {
       id,
@@ -123,16 +128,20 @@ export default function DashboardPage() {
               : m
           )
         );
+
+        if (updated.quantity === 0) return 'zero';
+        return 'ok';
       } else {
         console.error('Error actualizando cantidad');
+        return 'error';
       }
     } catch (error) {
       console.error('Error actualizando cantidad:', error);
+      return 'error';
     }
   }
 
   async function handleUpdateMaterial(material: Material): Promise<void> {
-    console.log('Intentando actualizar material: ', material);
     const token = localStorage.getItem('token');
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -152,7 +161,6 @@ export default function DashboardPage() {
         headers,
         body: JSON.stringify(updatedMaterial),
       });
-      console.log('Respuesta del servidor: ', res.status);
       if (res.ok) {
         const updated = await res.json();
         setMaterials((prev) =>
@@ -167,6 +175,21 @@ export default function DashboardPage() {
   }
 
   async function handleAddMaterial(newMaterialData: Omit<Material, 'id' | 'lastUpdated'>) {
+    const duplicate = materials.find(
+      (m) =>
+        m.name.trim().toLowerCase() === newMaterialData.name.trim().toLowerCase() &&
+        (m.description ?? '').trim().toLowerCase() === (newMaterialData.description ?? '').trim().toLowerCase()
+    );
+
+    if (duplicate) {
+      setPendingAddMaterial(newMaterialData);
+      setShowDuplicateDialog(true);
+    } else {
+      await addNewMaterial(newMaterialData);
+    }
+  }
+
+  async function addNewMaterial(newMaterialData: Omit<Material, 'id' | 'lastUpdated'>) {
     const token = localStorage.getItem('token');
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -192,46 +215,109 @@ export default function DashboardPage() {
     }
   }
 
+  async function confirmAddDuplicate(sumQuantity: boolean) {
+    if (!pendingAddMaterial) {
+      setShowDuplicateDialog(false);
+      return;
+    }
+
+    const duplicate = materials.find(
+      (m) =>
+        m.name.trim().toLowerCase() === pendingAddMaterial.name.trim().toLowerCase() &&
+        (m.description ?? '').trim().toLowerCase() === (pendingAddMaterial.description ?? '').trim().toLowerCase()
+    );
+
+    if (!duplicate) {
+      await addNewMaterial(pendingAddMaterial);
+    } else {
+      if (sumQuantity) {
+        const newQuantity = duplicate.quantity + pendingAddMaterial.quantity;
+        await handleUpdateMaterial({
+          ...duplicate,
+          quantity: newQuantity,
+          updatedBy: currentUser?.email || 'Desconocido',
+          lastUpdated: new Date().toISOString(),
+        });
+        setIsAddDialogOpen(false);
+      }
+    }
+
+    setPendingAddMaterial(null);
+    setShowDuplicateDialog(false);
+  }
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold">Materiales</h1>
-        </div>
+        <h1 className="text-3xl font-bold">Inventario de materiales</h1>
         <button
-          className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90 transition"
+          className="btn-primary"
           onClick={() => setIsAddDialogOpen(true)}
+          aria-label="Agregar material"
         >
-          Agregar material
+          + Agregar material
         </button>
       </div>
 
-      {/* 🔍 Campo de búsqueda */}
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Buscar por nombre, unidad, cantidad, descripción o actualizado por..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
-      </div>
+      <input
+        type="text"
+        placeholder="Buscar materiales..."
+        className="mb-4 p-2 border rounded w-full max-w-md"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
 
       <MaterialsTable
         materials={filteredMaterials}
-        currentUser={currentUser}
         currentUserRole={currentUserRole}
+        currentUser={currentUser}
         onRemove={handleRemove}
-        onUpdateQuantity={handleUpdateQuantity}
+        onUpdateQuantity={async (id, change) => {
+          const result = await handleUpdateQuantity(id, change, currentUser?.email || 'Desconocido');
+          return result;
+        }}
         onUpdateMaterial={handleUpdateMaterial}
       />
 
       <AddMaterialDialog
-        trigger={null}
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
         onAdd={handleAddMaterial}
+        trigger={
+          <button className="btn-primary" aria-label="Agregar material">
+            + Agregar material
+          </button>
+        }
       />
+
+      {showDuplicateDialog && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+        >
+          <div className="bg-white p-6 rounded shadow max-w-md w-full">
+            <h2 className="text-xl font-semibold mb-4">Material duplicado</h2>
+            <p className="mb-4">
+              Ya existe un material con el mismo nombre y descripción. ¿Quieres sumar la cantidad al material existente o cancelar?
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                className="btn-secondary"
+                onClick={() => confirmAddDuplicate(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                className="btn-primary"
+                onClick={() => confirmAddDuplicate(true)}
+              >
+                Sumar cantidad
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

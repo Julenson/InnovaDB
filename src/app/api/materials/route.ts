@@ -17,8 +17,8 @@ export async function POST(request: NextRequest) {
   try {
     const { name, category, quantity, lastUpdated, updatedBy, description } = await request.json();
 
-    if (!name || quantity === undefined) {
-      return NextResponse.json({ error: 'Name and quantity are required' }, { status: 400 });
+    if (!name || quantity === undefined || quantity < 0) {
+      return NextResponse.json({ error: 'Name and non-negative quantity are required' }, { status: 400 });
     }
 
     const newMaterial = await addMaterial(name, quantity, category, description, updatedBy, lastUpdated);
@@ -35,6 +35,10 @@ export async function PUT(request: NextRequest) {
 
     if (!id || !updatedBy) {
       return NextResponse.json({ error: 'ID and updatedBy are required' }, { status: 400 });
+    }
+
+    if (quantity !== undefined && quantity < 0) {
+      return NextResponse.json({ error: 'Quantity cannot be negative' }, { status: 400 });
     }
 
     const updatedMaterial = await updateMaterial({
@@ -54,7 +58,7 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
   try {
     const { id } = await request.json();
 
