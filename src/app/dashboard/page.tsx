@@ -278,18 +278,7 @@ export default function DashboardPage() {
         }}
         onUpdateMaterial={handleUpdateMaterial}
       />
-
-      <AddMaterialDialog
-        open={isAddDialogOpen}
-        onOpenChange={setIsAddDialogOpen}
-        onAdd={handleAddMaterial}
-        trigger={
-          <button className="btn-primary" aria-label="Agregar material">
-            + Agregar material
-          </button>
-        }
-      />
-
+      
       {showDuplicateDialog && (
         <div
           role="dialog"
