@@ -50,7 +50,8 @@ export default function DashboardPage() {
     fetchData();
   }, []);
 
-  const filteredMaterials = materials.filter((material) => {
+  const filteredMaterials = materials
+  .filter((material) => {
     const term = searchTerm.toLowerCase();
     return (
       material.name.toLowerCase().includes(term) ||
@@ -59,7 +60,8 @@ export default function DashboardPage() {
       material.updatedBy?.toLowerCase().includes(term) ||
       material.quantity.toString().includes(term)
     );
-  });
+  })
+  .sort((a, b) => a.name.localeCompare(b.name));
 
   async function handleRemove(id: number) {
   try {

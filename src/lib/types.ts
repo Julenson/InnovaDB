@@ -2,7 +2,7 @@ export interface Material {
   id: number;
   name: string;
   quantity: number;
-  category: string | null; // Allow category to be null to match db
+  category: string | null; 
   lastUpdated?: string | null; 
   updatedBy?: string | null;
   description: string | null;

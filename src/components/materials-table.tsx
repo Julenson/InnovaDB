@@ -116,7 +116,9 @@ export function MaterialsTable({
                         >
                           <Minus className="h-4 w-4" />
                         </Button>
-                        <span>{material.quantity}</span>
+                        <span>{Number(material.quantity) % 1 === 0
+                          ? material.quantity.toString()
+                          : material.quantity.toFixed(2)}</span>
                         <Button
                           variant="outline"
                           size="icon"
@@ -131,7 +133,7 @@ export function MaterialsTable({
                         </Button>
                       </div>
                     ) : (
-                      material.quantity
+                      material.quantity.toFixed(2)
                     )}
                   </TableCell>
                   <TableCell>{material.description}</TableCell>

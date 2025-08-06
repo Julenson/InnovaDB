@@ -44,7 +44,7 @@ export function EditMaterialDialog({ material, onSave, onClose, open }: Props) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    const parsedValue = name === 'quantity' ? parseInt(value, 10) || 0 : value;
+    const parsedValue = name === 'quantity' ? parseFloat(value) || 0 : value;
     setForm((prev) => ({ ...prev, [name]: parsedValue }));
   };
 
