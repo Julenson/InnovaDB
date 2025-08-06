@@ -13,7 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Mail, Lock } from 'lucide-react';
-import Image from 'next/image'; 
+import Logo from '../public/logo.svg';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -54,14 +54,7 @@ export default function LoginPage() {
       <div className="hidden bg-primary lg:flex lg:flex-col lg:items-center lg:justify-center lg:p-10">
         <div className="flex items-center text-primary-foreground">
           {/* Nuevo logo usando imagen en /public */}
-          <Image
-            src="/logo.png"
-            alt="Innova-Sport Logo"
-            width={160}
-            height={82}
-            className="object-contain"
-            priority
-          />
+          <Logo width={160} height={82} className="object-contain" />
         </div>
         <div className="mt-6 text-center">
           <p className="mt-2 text-lg text-primary-foreground/80">
