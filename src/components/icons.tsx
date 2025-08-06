@@ -1,6 +1,6 @@
 'use client';
 
-import LogoSvg from '@/src/assets/logo.svg';
+import LogoSvg from '@/assets/logo.svg';
 
 interface LogoProps {
   width?: number;
