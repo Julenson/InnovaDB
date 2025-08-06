@@ -73,7 +73,6 @@ export function MaterialsTable({
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Materiales</CardTitle>
           <CardDescription>Gestiona el inventario con facilidad desde aquí.</CardDescription>
         </CardHeader>
         <CardContent>
