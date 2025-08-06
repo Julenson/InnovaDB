@@ -52,7 +52,7 @@ export default function LoginPage() {
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
       <div className="hidden bg-primary lg:flex lg:flex-col lg:items-center lg:justify-center lg:p-10">
         <div className="flex items-center text-primary-foreground">
-          <div className="w-48 h-auto">
+          <div className="w-48">
             <Logo className="w-full h-auto" aria-label="Logo Innova-Sport" />
           </div>
         </div>

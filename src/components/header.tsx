@@ -31,7 +31,9 @@ export default function Header() {
           className="flex items-center"
           aria-label="Innova-Sport"
         >
-          <InnovaSportLogo className="h-8 w-[63px] text-primary" />
+          <div className="h-8 w-auto">
+            <InnovaSportLogo className="h-full w-auto object-contain" />
+          </div>
         </Link>
       </nav>
 
