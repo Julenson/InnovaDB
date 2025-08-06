@@ -3,18 +3,17 @@
 import LogoSvg from '@/assets/logo.svg';
 
 interface LogoProps {
-  width?: number;
-  height?: number;
   className?: string;
 }
 
-export function InnovaSportLogo({ className = '' }: { className?: string }) {
+export function InnovaSportLogo({ className = '' }: LogoProps) {
   return (
-    <LogoSvg
-      className={`${className} max-w-[180px] max-h-[90px] w-auto h-auto block`}
-      aria-label="Innova Sport Logo"
-      style={{ overflow: 'visible' }}
-    />
+    <div className={`max-w-[180px] max-h-[90px] ${className}`}>
+      <LogoSvg
+        aria-label="Innova Sport Logo"
+        style={{ width: '100%', height: 'auto', display: 'block', overflow: 'visible' }}
+      />
+    </div>
   );
 }
 
