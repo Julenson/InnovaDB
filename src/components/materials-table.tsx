@@ -53,7 +53,7 @@ interface MaterialsTableProps {
 
 function formatQuantity(qty: number | string) {
   const n = Number(qty);
-  return Number.isInteger(n) ? n.toString() : n.toFixed(2);
+  return Number.isInteger(n) ? n.toString() : parseFloat(n.toFixed(2)).toString();
 }
 
 export function MaterialsTable({
