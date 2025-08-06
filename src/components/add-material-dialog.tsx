@@ -56,7 +56,7 @@ export function AddMaterialDialog({ trigger, open, onOpenChange, onAdd }: AddMat
 
           <div>
             <label htmlFor="category" className="block text-sm font-medium leading-6 text-foreground">
-              Categoría
+              Ud. Medición
             </label>
             <input
               id="category"
