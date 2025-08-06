@@ -52,18 +52,19 @@ export default function LoginPage() {
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
       <div className="hidden bg-primary lg:flex lg:flex-col lg:items-center lg:justify-center lg:p-10">
         <div className="flex items-center text-primary-foreground">
-          {/* Logo SVG importado como componente React */}
-          <Logo width={160} height={82} aria-label="Logo Innova-Sport" />
+          <div className="w-48 h-auto">
+            <Logo className="w-full h-auto" aria-label="Logo Innova-Sport" />
+          </div>
         </div>
         <div className="mt-6 text-center">
           <p className="mt-2 text-lg text-primary-foreground/80">
             Manejo de Inventario
           </p>
         </div>
-        <p className="mt-auto text-sm text-primary-foreground/60">
-          &copy; 2024 Innova-Sport. All Rights Reserved.
-        </p>
-      </div>
+          <p className="mt-auto text-sm text-primary-foreground/60">
+            &copy; 2024 Innova-Sport. All Rights Reserved.
+          </p>
+    </div>
 
       <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto grid w-[350px] gap-6">
