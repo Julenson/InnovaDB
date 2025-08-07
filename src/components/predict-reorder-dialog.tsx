@@ -18,7 +18,7 @@ import { BrainCircuit, Loader2, Wand2 } from 'lucide-react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { handlePredictReorder } from '@/app/dashboard/actions';
+import { handlePredictReorder } from '@/app/dashboard/materials/actions';
 import type { PredictReorderPointsOutput } from '@/ai/flows/predict-reorder-points';
 import { useToast } from '@/hooks/use-toast';
 import {

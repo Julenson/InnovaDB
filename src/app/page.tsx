@@ -42,7 +42,7 @@ export default function LoginPage() {
 
       const data = await res.json();
       localStorage.setItem('token', data.token);
-      router.push('/dashboard');
+      router.push('/select-table');
     } catch {
       setError('Error en la conexión');
     }
