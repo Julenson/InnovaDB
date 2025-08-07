@@ -22,14 +22,14 @@ export default function UsersDashboardPage() {
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
       try {
-        const userRes = await fetch('/api/user', { headers });
+        const userRes = await fetch('@/app/api/user', { headers });
         if (userRes.ok) {
           const userData = await userRes.json();
           setCurrentUser(userData);
           setCurrentUserRole((userData.category || '').toLowerCase());
         }
 
-        const usersRes = await fetch('/api/users', { headers, cache: 'no-store' });
+        const usersRes = await fetch('@/app/api/user', { headers, cache: 'no-store' });
         if (usersRes.ok) {
           const usersData = await usersRes.json();
           console.log('Usuarios cargados:', usersData);
@@ -57,7 +57,7 @@ export default function UsersDashboardPage() {
 
   async function handleRemove(id: number) {
     try {
-      const res = await fetch('/api/users', {
+      const res = await fetch('@/app/api/user', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id }),
@@ -79,7 +79,7 @@ export default function UsersDashboardPage() {
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
     try {
-      const res = await fetch(`/api/users`, {
+      const res = await fetch(`@/app/api/user`, {
         method: 'PUT',
         headers,
         body: JSON.stringify(user),
@@ -114,7 +114,7 @@ export default function UsersDashboardPage() {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
-    const res = await fetch(`/api/users`, {
+    const res = await fetch(`@/app/api/user`, {
       method: 'POST',
       headers,
       body: JSON.stringify(newUserData),
