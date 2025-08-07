@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { UsersTable } from '@/components/users-table'; // Asegúrate de tener este componente
+import { UsersTable } from '@/components/users-table';
 import type { User } from '@/lib/types';
-import { AddUserDialog } from '@/components/add-user-dialog'; // También debes tener este diálogo
+import { AddUserDialog } from '@/components/add-user-dialog';
 
 export default function UsersDashboardPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -32,7 +32,7 @@ export default function UsersDashboardPage() {
         const usersRes = await fetch('/api/users', { headers, cache: 'no-store' });
         if (usersRes.ok) {
           const usersData = await usersRes.json();
-          setUsers(Array.isArray(usersData.users) ? usersData.users : []);
+          setUsers(Array.isArray(usersData) ? usersData : []);
         } else {
           console.error('No se pudo obtener usuarios');
         }
@@ -195,16 +195,10 @@ export default function UsersDashboardPage() {
               Ya existe un usuario con el mismo email. ¿Quieres sobrescribir los datos existentes o cancelar?
             </p>
             <div className="flex justify-end space-x-4">
-              <button
-                className="btn-secondary"
-                onClick={() => confirmAddDuplicate(false)}
-              >
+              <button className="btn-secondary" onClick={() => confirmAddDuplicate(false)}>
                 Cancelar
               </button>
-              <button
-                className="btn-primary"
-                onClick={() => confirmAddDuplicate(true)}
-              >
+              <button className="btn-primary" onClick={() => confirmAddDuplicate(true)}>
                 Sobrescribir
               </button>
             </div>

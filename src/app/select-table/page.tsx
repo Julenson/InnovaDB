@@ -10,25 +10,25 @@ export default function SelectTablePage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (loading) return; // espera a que cargue el usuario
+    if (loading) return;
 
     const userRole = user?.category?.toLowerCase() || '';
     if (!user || (userRole !== 'admin' && userRole !== 'developer')) {
-      router.replace('/login'); // o la ruta que uses para login
+      router.replace('/login');
     }
   }, [user, loading, router]);
 
   if (loading) {
-    return <div className="p-6 text-center">Cargando...</div>;
+    return <div className="h-screen flex items-center justify-center">Cargando...</div>;
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Selecciona una tabla para gestionar</h1>
-      <div className="flex flex-col gap-4 max-w-xs">
-        <Button onClick={() => router.push('/dashboard/users')}>Usuarios</Button>
-        <Button onClick={() => router.push('/dashboard/materials')}>Materiales</Button>
-        {/* Añade más botones si hay otras tablas */}
+    <div className="h-screen flex items-center justify-center">
+      <div className="p-6 bg-white rounded shadow-lg flex flex-col items-center gap-4">
+        <h1 className="text-2xl font-bold mb-2 text-center">Selecciona una tabla para gestionar</h1>
+        <Button className="w-48" onClick={() => router.push('/dashboard/users')}>Usuarios</Button>
+        <Button className="w-48" onClick={() => router.push('/dashboard/materials')}>Materiales</Button>
+        {/* Agrega más botones si hay otras tablas */}
       </div>
     </div>
   );
