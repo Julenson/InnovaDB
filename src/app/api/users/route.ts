@@ -1,4 +1,4 @@
-// src/app/api/user/route.ts
+// src/app/api/users/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
