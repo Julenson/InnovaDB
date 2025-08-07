@@ -1,28 +1,42 @@
 // src/app/api/users/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
+import client, { connectClient } from '@/lib/db';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_a_cambiar';
 
 export async function GET(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader) {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+  }
+
+  const token = authHeader.replace('Bearer ', '');
+
+  let payload: any;
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-    }
+    payload = jwt.verify(token, JWT_SECRET);
+  } catch {
+    return NextResponse.json({ error: 'Token inválido' }, { status: 401 });
+  }
 
-    const token = authHeader.replace('Bearer ', '');
-
-    let payload;
-    try {
-      payload = jwt.verify(token, JWT_SECRET);
-    } catch {
-      return NextResponse.json({ error: 'Token inválido' }, { status: 401 });
-    }
-
-    // Devuelve el payload del JWT (user info)
+  // Si el usuario solo quiere info propia
+  const onlyCurrent = request.nextUrl.searchParams.get('current');
+  if (onlyCurrent === 'true') {
     return NextResponse.json(payload);
-  } catch (error) {
-    return NextResponse.json({ error: 'Error interno' }, { status: 500 });
+  }
+
+  const role = (payload.category || '').trim().toLowerCase();
+  if (!['admin', 'developer'].includes(role)) {
+    return NextResponse.json({ error: 'No tienes permiso para ver usuarios' }, { status: 403 });
+  }
+
+  try {
+    await connectClient();
+    const result = await client.query('SELECT id, email, category FROM users ORDER BY email');
+    return NextResponse.json(result.rows);
+  } catch (err) {
+    console.error('Error al consultar usuarios:', err);
+    return NextResponse.json({ error: 'Error consultando usuarios' }, { status: 500 });
   }
 }

@@ -15,42 +15,50 @@ export default function UsersDashboardPage() {
   const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
 
   useEffect(() => {
-    async function fetchData() {
+    async function fetchCurrentUser() {
       const token = localStorage.getItem('token');
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
       try {
-        // Fetch usuario actual
-        const userRes = await fetch('/api/users', { headers });
-        if (userRes.ok) {
-          const userData = await userRes.json();
-          setCurrentUser(userData);
-          setCurrentUserRole((userData.category || '').trim().toLowerCase());
+        const res = await fetch('/api/users?current=true', { headers });
+        if (res.ok) {
+          const data = await res.json();
+          setCurrentUser(data);
+          setCurrentUserRole((data.category || '').trim().toLowerCase());
         } else {
           setCurrentUser(null);
           setCurrentUserRole('');
         }
-
-        // Fetch lista de usuarios
-        const usersRes = await fetch('/api/users', { headers, cache: 'no-store' });
-        if (usersRes.ok) {
-          const usersData = await usersRes.json();
-          console.log('Usuarios cargados:', usersData);
-          setUsers(Array.isArray(usersData) ? usersData : []);
-        } else {
-          console.error('No se pudo obtener usuarios');
-          setUsers([]);
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
+      } catch (err) {
+        console.error('Error obteniendo usuario actual:', err);
         setCurrentUser(null);
         setCurrentUserRole('');
+      }
+    }
+
+    async function fetchUsers() {
+      const token = localStorage.getItem('token');
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      try {
+        const res = await fetch('/api/users', { headers, cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          console.log('Usuarios cargados:', data);
+          setUsers(Array.isArray(data) ? data : []);
+        } else {
+          console.error('Error al obtener usuarios');
+          setUsers([]);
+        }
+      } catch (err) {
+        console.error('Error al cargar usuarios:', err);
         setUsers([]);
       }
     }
 
-    fetchData();
+    fetchCurrentUser().then(fetchUsers);
   }, []);
 
   const filteredUsers = users
