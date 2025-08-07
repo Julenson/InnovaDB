@@ -16,6 +16,8 @@ export async function GET(request: NextRequest) {
   let payload: any;
   try {
     payload = jwt.verify(token, JWT_SECRET);
+    console.log('Usuario autenticado: ', payload);
+    console.log('Consultando usuarios desde DB...');
   } catch {
     return NextResponse.json({ error: 'Token inválido' }, { status: 401 });
   }
@@ -34,6 +36,7 @@ export async function GET(request: NextRequest) {
   try {
     await connectClient();
     const result = await client.query('SELECT id, email, category FROM users ORDER BY email');
+    console.log('Usuarios desde la DB:', result.rows);
     return NextResponse.json(result.rows);
   } catch (err) {
     console.error('Error al consultar usuarios:', err);
