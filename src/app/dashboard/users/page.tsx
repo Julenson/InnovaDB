@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { UsersTable } from '@/components/users-table';
+import { EditUserDialog } from '@/components/edit-user-dialog';
 import type { User } from '@/lib/types';
 import { AddUserDialog } from '@/components/add-user-dialog';
 
@@ -13,6 +14,10 @@ export default function UsersDashboardPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [pendingAddUser, setPendingAddUser] = useState<Omit<User, 'id'> | null>(null);
   const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
+
+  // Estados para editar usuario
+  const [editUser, setEditUser] = useState<User | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   useEffect(() => {
     async function fetchCurrentUser() {
@@ -69,7 +74,7 @@ export default function UsersDashboardPage() {
         (user.category?.toLowerCase().includes(term) ?? false)
       );
     })
-    .sort((a, b) => a.email.localeCompare(b.email));
+    .sort((a, b) => a.id - b.id);
 
   async function handleRemove(id: number) {
     try {
@@ -111,6 +116,18 @@ export default function UsersDashboardPage() {
       console.error('Error actualizando usuario:', error);
     }
   }
+
+  // Función para abrir diálogo editar
+  const openEditDialog = (user: User) => {
+    setEditUser(user);
+    setIsEditDialogOpen(true);
+  };
+
+  // Función para cerrar diálogo editar
+  const closeEditDialog = () => {
+    setEditUser(null);
+    setIsEditDialogOpen(false);
+  };
 
   async function handleAddUser(newUserData: Omit<User, 'id'>) {
     const duplicate = users.find(
@@ -203,7 +220,7 @@ export default function UsersDashboardPage() {
             currentUserRole={currentUserRole}
             currentUser={currentUser}
             onRemove={handleRemove}
-            onEdit={handleUpdateUser}
+            onEdit={openEditDialog}
           />
         ) : (
           <p className="text-center text-gray-600">No tienes permisos para ver esta página.</p>
@@ -238,6 +255,19 @@ export default function UsersDashboardPage() {
           onAdd={handleAddUser}
           trigger={null}
         />
+
+        {/* Diálogo de edición */}
+        {editUser && (
+          <EditUserDialog
+            user={editUser}
+            open={isEditDialogOpen}
+            onClose={closeEditDialog}
+            onSave={async (updatedUser) => {
+              await handleUpdateUser(updatedUser);
+              closeEditDialog();
+            }}
+          />
+        )}
       </div>
     </div>
   );
