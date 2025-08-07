@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     await connectClient();
 
     const result = await client.query(
-      'SELECT * FROM users WHERE mail = $1 AND password = $2',
+      'SELECT * FROM users WHERE email = $1 AND password = $2',
       [email, password]
     );
 
