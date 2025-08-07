@@ -21,13 +21,18 @@ export default function UsersDashboardPage() {
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
       try {
-        const userRes = await fetch('/api/users/current', { headers });
+        // Fetch usuario actual
+        const userRes = await fetch('/api/user', { headers });
         if (userRes.ok) {
           const userData = await userRes.json();
           setCurrentUser(userData);
-          setCurrentUserRole((userData.category || '').toLowerCase());
+          setCurrentUserRole((userData.category || '').trim().toLowerCase());
+        } else {
+          setCurrentUser(null);
+          setCurrentUserRole('');
         }
 
+        // Fetch lista de usuarios
         const usersRes = await fetch('/api/users', { headers, cache: 'no-store' });
         if (usersRes.ok) {
           const usersData = await usersRes.json();
@@ -35,9 +40,13 @@ export default function UsersDashboardPage() {
           setUsers(Array.isArray(usersData) ? usersData : []);
         } else {
           console.error('No se pudo obtener usuarios');
+          setUsers([]);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
+        setCurrentUser(null);
+        setCurrentUserRole('');
+        setUsers([]);
       }
     }
 
