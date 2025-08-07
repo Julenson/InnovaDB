@@ -32,6 +32,7 @@ export default function UsersDashboardPage() {
         const usersRes = await fetch('/api/users', { headers, cache: 'no-store' });
         if (usersRes.ok) {
           const usersData = await usersRes.json();
+          console.log('Usuarios cargados:', usersData);
           setUsers(Array.isArray(usersData) ? usersData : []);
         } else {
           console.error('No se pudo obtener usuarios');
