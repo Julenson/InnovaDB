@@ -11,7 +11,6 @@ export default function UsersDashboardPage() {
   const [currentUserRole, setCurrentUserRole] = useState<string>('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
   const [pendingAddUser, setPendingAddUser] = useState<Omit<User, 'id'> | null>(null);
   const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
 
@@ -22,14 +21,14 @@ export default function UsersDashboardPage() {
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
       try {
-        const userRes = await fetch('@/app/api/user', { headers });
+        const userRes = await fetch('/api/users/current', { headers });
         if (userRes.ok) {
           const userData = await userRes.json();
           setCurrentUser(userData);
           setCurrentUserRole((userData.category || '').toLowerCase());
         }
 
-        const usersRes = await fetch('@/app/api/user', { headers, cache: 'no-store' });
+        const usersRes = await fetch('/api/users', { headers, cache: 'no-store' });
         if (usersRes.ok) {
           const usersData = await usersRes.json();
           console.log('Usuarios cargados:', usersData);
@@ -57,7 +56,7 @@ export default function UsersDashboardPage() {
 
   async function handleRemove(id: number) {
     try {
-      const res = await fetch('@/app/api/user', {
+      const res = await fetch('/api/users', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id }),
@@ -79,7 +78,7 @@ export default function UsersDashboardPage() {
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
     try {
-      const res = await fetch(`@/app/api/user`, {
+      const res = await fetch('/api/users', {
         method: 'PUT',
         headers,
         body: JSON.stringify(user),
@@ -114,7 +113,7 @@ export default function UsersDashboardPage() {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
-    const res = await fetch(`@/app/api/user`, {
+    const res = await fetch('/api/users', {
       method: 'POST',
       headers,
       body: JSON.stringify(newUserData),
@@ -155,64 +154,74 @@ export default function UsersDashboardPage() {
     setShowDuplicateDialog(false);
   }
 
+  const isAuthorized = ['admin', 'developer'].includes(currentUserRole);
+
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Gestión de Usuarios</h1>
-        <button
-          className="btn-primary"
-          onClick={() => setIsAddDialogOpen(true)}
-          aria-label="Agregar usuario"
-        >
-          + Agregar usuario
-        </button>
-      </div>
+    <div className="p-6 flex justify-center">
+      <div className="w-full max-w-4xl">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Gestión de Usuarios</h1>
+          {isAuthorized && (
+            <button
+              className="btn-primary"
+              onClick={() => setIsAddDialogOpen(true)}
+              aria-label="Agregar usuario"
+            >
+              + Agregar usuario
+            </button>
+          )}
+        </div>
 
-      <input
-        type="text"
-        placeholder="Buscar usuarios..."
-        className="mb-4 p-2 border rounded w-full max-w-md"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
+        <input
+          type="text"
+          placeholder="Buscar usuarios..."
+          className="mb-4 p-2 border rounded w-full"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
 
-      <UsersTable
-        users={filteredUsers}
-        currentUserRole={currentUserRole}
-        currentUser={currentUser}
-        onRemove={handleRemove}
-        onEdit={handleUpdateUser}
-      />
+        {isAuthorized ? (
+          <UsersTable
+            users={filteredUsers}
+            currentUserRole={currentUserRole}
+            currentUser={currentUser}
+            onRemove={handleRemove}
+            onEdit={handleUpdateUser}
+          />
+        ) : (
+          <p className="text-center text-gray-600">No tienes permisos para ver esta página.</p>
+        )}
 
-      {showDuplicateDialog && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-        >
-          <div className="bg-white p-6 rounded shadow max-w-md w-full">
-            <h2 className="text-xl font-semibold mb-4">Usuario duplicado</h2>
-            <p className="mb-4">
-              Ya existe un usuario con el mismo email. ¿Quieres sobrescribir los datos existentes o cancelar?
-            </p>
-            <div className="flex justify-end space-x-4">
-              <button className="btn-secondary" onClick={() => confirmAddDuplicate(false)}>
-                Cancelar
-              </button>
-              <button className="btn-primary" onClick={() => confirmAddDuplicate(true)}>
-                Sobrescribir
-              </button>
+        {showDuplicateDialog && (
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+          >
+            <div className="bg-white p-6 rounded shadow max-w-md w-full">
+              <h2 className="text-xl font-semibold mb-4">Usuario duplicado</h2>
+              <p className="mb-4">
+                Ya existe un usuario con el mismo email. ¿Quieres sobrescribir los datos existentes o cancelar?
+              </p>
+              <div className="flex justify-end space-x-4">
+                <button className="btn-secondary" onClick={() => confirmAddDuplicate(false)}>
+                  Cancelar
+                </button>
+                <button className="btn-primary" onClick={() => confirmAddDuplicate(true)}>
+                  Sobrescribir
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <AddUserDialog
-        open={isAddDialogOpen}
-        onOpenChange={setIsAddDialogOpen}
-        onAdd={handleAddUser}
-        trigger={null}
-      />
+        <AddUserDialog
+          open={isAddDialogOpen}
+          onOpenChange={setIsAddDialogOpen}
+          onAdd={handleAddUser}
+          trigger={null}
+        />
+      </div>
     </div>
   );
 }
