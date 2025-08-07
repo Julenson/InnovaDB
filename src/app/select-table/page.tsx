@@ -12,8 +12,8 @@ export default function SelectTablePage() {
   useEffect(() => {
     if (loading) return;
 
-    const userRole = user?.category?.toLowerCase() || '';
-    if (!user || (userRole !== 'admin' && userRole !== 'developer')) {
+    // Si no hay usuario, redirige a login
+    if (!user) {
       router.replace('/login');
     }
   }, [user, loading, router]);
@@ -22,13 +22,27 @@ export default function SelectTablePage() {
     return <div className="h-screen flex items-center justify-center">Cargando...</div>;
   }
 
+  // Normaliza rol
+  const role = user?.category?.toLowerCase() || '';
+
   return (
     <div className="h-screen flex items-center justify-center">
       <div className="p-6 bg-white rounded shadow-lg flex flex-col items-center gap-4">
         <h1 className="text-2xl font-bold mb-2 text-center">Selecciona una tabla para gestionar</h1>
-        <Button className="w-48" onClick={() => router.push('/dashboard/users')}>Usuarios</Button>
-        <Button className="w-48" onClick={() => router.push('/dashboard/materials')}>Materiales</Button>
-        {/* Agrega más botones si hay otras tablas */}
+
+        {/* Mostrar botón Usuarios SOLO para admin o developer */}
+        {(role === 'admin' || role === 'developer') && (
+          <Button className="w-48" onClick={() => router.push('/dashboard/users')}>
+            Usuarios
+          </Button>
+        )}
+
+        {/* Siempre mostramos materiales */}
+        <Button className="w-48" onClick={() => router.push('/dashboard/materials')}>
+          Materiales
+        </Button>
+
+        {/* Puedes añadir más botones aquí con sus respectivos controles de acceso */}
       </div>
     </div>
   );
