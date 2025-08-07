@@ -24,7 +24,7 @@ export function useUser() {
       }
 
       try {
-        const res = await fetch('/api/user', {
+        const res = await fetch('/api/users', {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error('No autorizado');
