@@ -184,62 +184,19 @@ export function MaterialsTable({
                             <MoreHorizontal className="h-5 w-5" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+
+                        <DropdownMenuContent align="end" className="bg-white border rounded shadow-md">
                           <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setEditingMaterial(material);
-                              setMenuOpenFor(null);
-                            }}
-                            className="cursor-pointer flex items-center gap-2"
-                          >
-                            <Edit2 className="h-4 w-4" /> Editar
+
+                          <DropdownMenuItem onClick={() => alert(`Editar ${material.name}`)}>
+                            <Edit2 className="mr-2 h-4 w-4" />
+                            Editar
                           </DropdownMenuItem>
 
-                          <AlertDialog
-                            open={deletingMaterialId === material.id}
-                            onOpenChange={(open) => !open && setDeletingMaterialId(null)}
-                          >
-                            <AlertDialogTrigger asChild>
-                              <div
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setDeletingMaterialId(material.id);
-                                }}
-                                className="text-destructive cursor-pointer flex items-center gap-2 px-3 py-2"
-                                role="button"
-                                tabIndex={0}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter' || e.key === ' ') {
-                                    e.preventDefault();
-                                    setDeletingMaterialId(material.id);
-                                  }
-                                }}
-                                aria-label={`Eliminar material ${material.name}`}
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Eliminar
-                              </div>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>¿Seguro que quieres eliminar?</AlertDialogTitle>
-                                <AlertDialogDescription>Esta acción no se puede deshacer.</AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => {
-                                    onRemove(material.id);
-                                    setDeletingMaterialId(null);
-                                    setMenuOpenFor(null);
-                                  }}
-                                >
-                                  Eliminar
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                          <DropdownMenuItem onClick={() => alert(`Eliminar ${material.name}`)}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Eliminar
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     )}
