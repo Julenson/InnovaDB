@@ -31,7 +31,7 @@ export default function SelectTablePage() {
         <h1 className="text-2xl font-bold mb-2 text-center">Selecciona una tabla para gestionar</h1>
 
         {/* Mostrar botón Usuarios SOLO para admin o developer */}
-        {(role === 'admin' || role === 'developer') && (
+        {(role === 'owner' || role === 'developer') && (
           <Button className="w-48" onClick={() => router.push('/dashboard/users')}>
             Usuarios
           </Button>
