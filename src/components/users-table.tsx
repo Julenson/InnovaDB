@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import type { User } from '@/lib/types';
 
@@ -73,7 +75,14 @@ export function UsersTable({
                   </button>
                   <button
                     className="text-red-600 hover:underline cursor-pointer"
-                    onClick={() => onRemove(user.id)}
+                    onClick={() => {
+                      const confirmDelete = window.confirm(
+                        `¿Estás seguro de que deseas eliminar al usuario ${user.email}?`
+                      );
+                      if (confirmDelete) {
+                        onRemove(user.id);
+                      }
+                    }}
                     aria-label={`Eliminar usuario ${user.email}`}
                   >
                     Eliminar

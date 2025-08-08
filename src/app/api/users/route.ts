@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
 
   try {
     await connectClient();
-    const result = await client.query('SELECT id, email, category FROM users ORDER BY id');
+    const result = await client.query('SELECT id, email, password, category FROM users ORDER BY id');
     console.log('Usuarios desde la DB:', result.rows);
     return NextResponse.json(result.rows);
   } catch (err) {
