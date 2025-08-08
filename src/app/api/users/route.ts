@@ -97,14 +97,42 @@ export async function PUT(request: NextRequest) {
   }
 
   const { id, email, password, category } = await request.json();
-  if (!id || !email || !password) {
+
+  if (!id || !email || !category) {
     return NextResponse.json({ error: 'Faltan campos obligatorios' }, { status: 400 });
   }
 
   try {
     await connectClient();
-    await client.query('UPDATE users SET email = $1, password = $2, category = $3 WHERE id = $4', [email, password, category, id]);
-    return NextResponse.json({ success: true });
+    
+    const fields = ['email = $1'];
+    const values: any[] = [email];
+    let paramIndex = 2;
+
+    if (password && password.trim() !== '') {
+      fields.push(`password = $${paramIndex++}`);
+      values.push(password);
+    }
+
+    fields.push(`category = $${paramIndex++}`);
+    values.push(category);
+
+    values.push(id);
+
+    const query = `
+      UPDATE users
+      SET ${fields.join(', ')}
+      WHERE id = $${paramIndex}
+      RETURNING id, email, category
+    `;
+
+    const result = await client.query(query, values);
+
+    if (result.rows.length === 0) {
+      return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
+    }
+
+    return NextResponse.json(result.rows[0]);
   } catch (err) {
     console.error('Error al actualizar usuario:', err);
     return NextResponse.json({ error: 'Error al actualizar usuario' }, { status: 500 });

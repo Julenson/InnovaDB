@@ -41,15 +41,17 @@ export function EditUserDialog({ user, onSave, onClose, open }: Props) {
   };
 
   const handleSubmit = async () => {
-    // En el backend hay que gestionar si password está vacío: no cambiarla
-    await onSave({
-      id: user.id,
-      email: form.email,
-      password: form.password, // Puede estar vacío
-      category: form.category,
-    });
-    onClose(); // cerrar después de guardar
+  const updatedUser: Partial<User> = {
+    id: user.id,
+    email: form.email,
+    category: form.category,
   };
+  if (form.password.trim() !== '') {
+    updatedUser.password = form.password;
+  }
+  await onSave(updatedUser as User);
+  onClose();
+};
 
   return (
     <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
