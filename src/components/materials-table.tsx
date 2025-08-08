@@ -182,12 +182,13 @@ export function MaterialsTable({
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
-                            className="h-8 w-8 p-0 bg-yellow-300 border border-red-600"
+                            className="h-8 w-8 p-0 bg-transparent border border-red-600"
                             aria-label={`Abrir menú de acciones para ${material.name}`}
                           >
                             <MoreHorizontal className="h-5 w-5 text-red-700" />
                           </Button>
                         </DropdownMenuTrigger>
+
 
                         <DropdownMenuContent
                           align="end"
