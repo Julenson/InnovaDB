@@ -73,20 +73,16 @@ export function MaterialsTable({
   const [deletingMaterialId, setDeletingMaterialId] = React.useState<number | null>(null);
   const [menuOpenFor, setMenuOpenFor] = React.useState<number | null>(null);
 
-  // Función para restar cantidad con control de cantidad cero
   const handleSubtract = async (material: Material) => {
     if (!currentUser) return;
 
-    // Restar 1 (entero)
     const result = await onUpdateQuantity(material.id, -1, currentUser.email);
 
     if (result === 'zero') {
-      // Si llega a cero, mostrar diálogo de confirmación para eliminar
       setDeletingMaterialId(material.id);
     }
   };
 
-  // Función para sumar cantidad (entero)
   const handleAdd = async (material: Material) => {
     if (!currentUser) return;
     await onUpdateQuantity(material.id, 1, currentUser.email);
@@ -180,8 +176,12 @@ export function MaterialsTable({
                         }}
                       >
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0" aria-label={`Abrir menú de acciones para ${material.name}`}>
-                            <MoreHorizontal className="h-4 w-4" />
+                          <Button
+                            variant="ghost"
+                            className="h-8 w-8 p-0 bg-gray-200 text-gray-700 hover:bg-gray-300"
+                            aria-label={`Abrir menú de acciones para ${material.name}`}
+                          >
+                            <MoreHorizontal className="h-5 w-5" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">

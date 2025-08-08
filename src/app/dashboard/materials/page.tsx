@@ -12,7 +12,9 @@ export default function DashboardPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const [pendingAddMaterial, setPendingAddMaterial] = useState<Omit<Material, 'id' | 'lastUpdated'> | null>(null);
+  const [pendingAddMaterial, setPendingAddMaterial] = useState<
+    Omit<Material, 'id' | 'lastUpdated'> | null
+  >(null);
   const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
 
   useEffect(() => {
@@ -248,17 +250,32 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Inventario de materiales</h1>
-      </div>
+      <h1 className="text-3xl font-bold mb-6">Inventario de materiales</h1>
 
-      <input
-        type="text"
-        placeholder="Buscar materiales..."
-        className="mb-4 p-2 border rounded w-full max-w-md"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
+      {/* Contenedor para buscador y botón */}
+      <div className="flex justify-between items-center mb-4 max-w-full">
+        <input
+          type="text"
+          placeholder="Buscar materiales..."
+          className="p-2 border rounded w-full max-w-md"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+
+        <AddMaterialDialog
+          open={isAddDialogOpen}
+          onOpenChange={setIsAddDialogOpen}
+          onAdd={handleAddMaterial}
+          trigger={
+            <button
+              className="ml-4 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded whitespace-nowrap"
+              aria-label="Agregar material"
+            >
+              + Agregar material
+            </button>
+          }
+        />
+      </div>
 
       <MaterialsTable
         materials={filteredMaterials}
@@ -300,21 +317,6 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
-
-      <AddMaterialDialog
-        open={isAddDialogOpen}
-        onOpenChange={setIsAddDialogOpen}
-        onAdd={handleAddMaterial}
-        trigger={
-          <button
-            className="btn-primary"
-            aria-label="Agregar material"
-            type="button"
-          >
-            + Agregar material
-          </button>
-        }
-      />
     </div>
   );
 }
