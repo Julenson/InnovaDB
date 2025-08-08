@@ -66,8 +66,10 @@ export function MaterialsTable({
   currentUser,
   currentUserRole,
 }: MaterialsTableProps) {
+  // Forzar canEdit a true para debug visual
   const role = currentUserRole?.trim().toLowerCase();
-  const canEdit = ['admin', 'owner', 'developer', 'employee'].includes(role);
+  const canEdit = true; // ['admin', 'owner', 'developer', 'employee'].includes(role);
+
   const [editingMaterial, setEditingMaterial] = React.useState<Material | null>(null);
   const [deletingMaterialId, setDeletingMaterialId] = React.useState<number | null>(null);
   const [menuOpenFor, setMenuOpenFor] = React.useState<number | null>(null);
@@ -85,7 +87,6 @@ export function MaterialsTable({
     await onUpdateQuantity(material.id, 1, currentUser.email);
   };
 
-  // Debug console log to check menu open state
   React.useEffect(() => {
     console.log('Menu open for material id:', menuOpenFor);
   }, [menuOpenFor]);
@@ -109,7 +110,7 @@ export function MaterialsTable({
                 <TableHead>Descripción</TableHead>
                 <TableHead>Última Actualización</TableHead>
                 <TableHead>Actualizado Por</TableHead>
-                <TableHead><span className="sr-only">Acciones</span></TableHead>
+                <TableHead className="w-[60px] text-center"><span className="sr-only">Acciones</span></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -164,7 +165,7 @@ export function MaterialsTable({
                   <TableCell className="text-right">
                     {material.updatedBy && material.updatedBy.trim() !== '' ? material.updatedBy : '—'}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">
                     {canEdit && (
                       <DropdownMenu
                         open={menuOpenFor === material.id}
@@ -181,10 +182,10 @@ export function MaterialsTable({
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
-                            className="h-8 w-8 p-0 bg-gray-200 text-gray-700 hover:bg-gray-300"
+                            className="h-8 w-8 p-0 bg-yellow-300 border border-red-600"
                             aria-label={`Abrir menú de acciones para ${material.name}`}
                           >
-                            <MoreHorizontal className="h-5 w-5" />
+                            <MoreHorizontal className="h-5 w-5 text-red-700" />
                           </Button>
                         </DropdownMenuTrigger>
 
