@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
   }
 
   const role = (payload.category || '').trim().toLowerCase();
-  if (!['admin', 'developer'].includes(role)) {
+  if (!['owner', 'developer'].includes(role)) {
     return NextResponse.json({ error: 'No tienes permiso para ver usuarios' }, { status: 403 });
   }
 
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
   }
 
   const role = (payload.category || '').trim().toLowerCase();
-  if (!['admin', 'developer'].includes(role)) {
+  if (!['owner', 'developer'].includes(role)) {
     return NextResponse.json({ error: 'No tienes permiso para crear usuarios' }, { status: 403 });
   }
 
@@ -92,7 +92,7 @@ export async function PUT(request: NextRequest) {
   }
 
   const role = (payload.category || '').trim().toLowerCase();
-  if (!['admin', 'developer'].includes(role)) {
+  if (!['owner', 'developer'].includes(role)) {
     return NextResponse.json({ error: 'No tienes permiso para editar usuarios' }, { status: 403 });
   }
 
@@ -154,7 +154,7 @@ export async function DELETE(request: NextRequest) {
   }
 
   const role = (payload.category || '').trim().toLowerCase();
-  if (!['admin', 'developer'].includes(role)) {
+  if (!['owner', 'developer'].includes(role)) {
     return NextResponse.json({ error: 'No tienes permiso para eliminar usuarios' }, { status: 403 });
   }
 

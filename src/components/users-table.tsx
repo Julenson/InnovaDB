@@ -9,7 +9,7 @@ interface UsersTableProps {
   currentUserRole: string;
   currentUser: User | null;
   onEdit: (user: User) => void;
-  onDelete: (user: User) => void; // Nuevo callback para abrir diálogo de eliminación
+  onDelete: (user: User) => void;
 }
 
 export function UsersTable({
