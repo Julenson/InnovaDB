@@ -15,11 +15,13 @@ export async function initDatabase() {
     CREATE TABLE IF NOT EXISTS materials (
       id SERIAL PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
-      quantity INTEGER NOT NULL DEFAULT 0,
+      quantity NUMERIC(10,2) NOT NULL DEFAULT 0.00,
+      valor NUMERIC(10,2) NOT NULL DEFAULT 0.00,
+      factura VARCHAR(255), -- nuevo campo para factura
       category VARCHAR(255),
       description VARCHAR(255),
-      updatedBy VARCHAR(255),  -- Falta campo para usuario que actualizó
-      lastUpdated TIMESTAMP DEFAULT NOW()  -- Falta campo para fecha última actualización
+      updatedBy VARCHAR(255),
+      lastUpdated TIMESTAMP DEFAULT NOW()
     );
   `);
 
@@ -39,118 +41,93 @@ export async function initDatabase() {
   `);
 }
 
+function parseMaterialRow(row: any): Material {
+  return {
+    ...row,
+    quantity: parseFloat(row.quantity),
+    valor: parseFloat(row.valor),
+    factura: row.factura || null,
+  };
+}
+
 export async function getAllMaterials(): Promise<Material[]> {
   await connectClient();
-  try {
-    const result = await client.query('SELECT id, name, quantity, category, description, updatedBy, lastUpdated FROM materials');
-    console.log('getAllMaterials:', result.rows);
-    return result.rows as Material[];
-  } catch (error) {
-    console.error('Error en getAllMaterials:', error);
-    throw error;
-  }
+  const result = await client.query('SELECT id, name, quantity, valor, factura, category, description, updatedBy, lastUpdated FROM materials');
+  return result.rows.map(parseMaterialRow) as Material[];
 }
 
 export async function getMaterialById(id: number): Promise<Material | undefined> {
   await connectClient();
   const result = await client.query(
-    'SELECT id, name, quantity, category, description, updatedBy, lastUpdated FROM materials WHERE id = $1',
+    'SELECT id, name, quantity, valor, factura, category, description, updatedBy, lastUpdated FROM materials WHERE id = $1',
     [id]
   );
-  return result.rows[0];
-}
-
-export async function getMaterialByName(name: string): Promise<Material | undefined> {
-  await connectClient();
-  const result = await client.query(
-    'SELECT id, name, quantity, category, description FROM materials WHERE name = $1',
-    [name]
-  );
-  return result.rows[0];
-}
-
-export async function getMaterialByQuantity(quantity: number): Promise<Material | undefined> {
-  await connectClient();
-  const result = await client.query(
-    'SELECT id, name, quantity, category, description FROM materials WHERE quantity = $1',
-    [quantity]
-  );
-  return result.rows[0];
-}
-
-export async function getMaterialByCategory(category: string): Promise<Material | undefined> {
-  await connectClient();
-  const result = await client.query(
-    'SELECT id, name, quantity, category, description FROM materials WHERE category = $1',
-    [category]
-  );
-  return result.rows[0];
-}
-
-export async function getMaterialByDescription(description: string): Promise<Material | undefined> {
-  await connectClient();
-  const result = await client.query(
-    'SELECT id, name, quantity, category, description FROM materials WHERE description = $1',
-    [description]
-  );
-  return result.rows[0];
+  if (result.rows.length === 0) return undefined;
+  return parseMaterialRow(result.rows[0]);
 }
 
 export async function addMaterial(
   name: string,
   quantity: number,
+  valor: number,
+  factura: string | null,
   category: string | null,
   description: string | null,
   updatedBy: string,
-  lastUpdated?: string //lo hacemos opcional
+  lastUpdated?: string
 ): Promise<Material> {
   await connectClient();
 
+  quantity = parseFloat(quantity.toFixed(2));
+  valor = parseFloat(valor.toFixed(2));
+
   const result = await client.query(
-    `INSERT INTO materials (name, quantity, category, description, updatedBy, lastUpdated)
-     VALUES ($1, $2, $3, $4, $5, $6)
-     RETURNING id, name, quantity, category, description, updatedBy, lastUpdated`,
-    [name, quantity, category, description, updatedBy, lastUpdated || new Date().toISOString()] // ✅ default a NOW si no lo pasan
+    `INSERT INTO materials (name, quantity, valor, factura, category, description, updatedBy, lastUpdated)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+     RETURNING id, name, quantity, valor, factura, category, description, updatedBy, lastUpdated`,
+    [name, quantity, valor, factura, category, description, updatedBy, lastUpdated || new Date().toISOString()]
   );
 
-  return result.rows[0];
+  return parseMaterialRow(result.rows[0]);
 }
 
-
-// Cambié el updateMaterialQuantity para aceptar updatedBy y actualizar lastUpdated:
-export async function updateMaterialQuantity(
+export async function updateMaterialQuantityAndValor(
   id: number,
   quantity: number,
+  valor: number,
   updatedBy: string
 ): Promise<Material> {
   await connectClient();
+
+  quantity = parseFloat(quantity.toFixed(2));
+  valor = parseFloat(valor.toFixed(2));
+
   const result = await client.query(
     `UPDATE materials 
-     SET quantity = $1, updatedBy = $2, lastUpdated = NOW()
-     WHERE id = $3
-     RETURNING id, name, quantity, category, description, updatedBy, lastUpdated`,
-    [quantity, updatedBy, id]
+     SET quantity = $1, valor = $2, updatedBy = $3, lastUpdated = NOW()
+     WHERE id = $4
+     RETURNING id, name, quantity, valor, factura, category, description, updatedBy, lastUpdated`,
+    [quantity, valor, updatedBy, id]
   );
-  return result.rows[0];
+  return parseMaterialRow(result.rows[0]);
 }
 
-// Para updateMaterialDescription y updateMaterialCategory había error en 'result.row[0]' (debe ser rows)
 export async function updateMaterialDescription(id: number, description: string): Promise<Material> {
   await connectClient();
   const result = await client.query(
-    'UPDATE materials SET description = $1 WHERE id = $2 RETURNING id, name, quantity, category, description, updatedBy, lastUpdated',
+    'UPDATE materials SET description = $1 WHERE id = $2 RETURNING *',
     [description, id]
   );
-  return result.rows[0];
+  return parseMaterialRow(result.rows[0]);
 }
 
 export async function updateMaterialCategory(id: number, category: string): Promise<Material> {
   await connectClient();
   const result = await client.query(
-    'UPDATE materials SET category = $1 WHERE id = $2 RETURNING id, name, quantity, category, description, updatedBy, lastUpdated',
+    'UPDATE materials SET category = $1 WHERE id = $2 RETURNING *',
     [category, id]
   );
-  return result.rows[0];
+  return parseMaterialRow(result.rows[0]);
 }
 
 type UpdateMaterialArgs = {
@@ -158,6 +135,8 @@ type UpdateMaterialArgs = {
   name?: string | null;
   category?: string | null;
   quantity?: number | null;
+  valor?: number | null;
+  factura?: string | null;
   description?: string | null;
   updatedBy: string;
   lastUpdated?: string;
@@ -168,6 +147,8 @@ export async function updateMaterial({
   name,
   category,
   quantity,
+  valor,
+  factura,
   description,
   updatedBy,
   lastUpdated,
@@ -185,8 +166,18 @@ export async function updateMaterial({
     values.push(category);
   }
   if (quantity !== undefined && quantity !== null) {
+    quantity = parseFloat(quantity.toFixed(2));
     fields.push(`quantity = $${fields.length + 1}`);
     values.push(quantity);
+  }
+  if (valor !== undefined && valor !== null) {
+    valor = parseFloat(valor.toFixed(2));
+    fields.push(`valor = $${fields.length + 1}`);
+    values.push(valor);
+  }
+  if (factura !== undefined && factura !== null) {
+    fields.push(`factura = $${fields.length + 1}`);
+    values.push(factura);
   }
   if (description !== undefined && description !== null) {
     fields.push(`description = $${fields.length + 1}`);
@@ -203,7 +194,7 @@ export async function updateMaterial({
   values.push(id);
 
   const result = await client.query(query, values);
-  return result.rows[0];
+  return parseMaterialRow(result.rows[0]);
 }
 
 export async function deleteMaterial(id: number): Promise<void> {

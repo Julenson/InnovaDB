@@ -66,9 +66,8 @@ export function MaterialsTable({
   currentUser,
   currentUserRole,
 }: MaterialsTableProps) {
-  // Forzar canEdit a true para debug visual
   const role = currentUserRole?.trim().toLowerCase();
-  const canEdit = true; // ['admin', 'owner', 'developer', 'employee'].includes(role);
+  const canEdit = true;
 
   const [editingMaterial, setEditingMaterial] = React.useState<Material | null>(null);
   const [deletingMaterialId, setDeletingMaterialId] = React.useState<number | null>(null);
@@ -87,10 +86,6 @@ export function MaterialsTable({
     await onUpdateQuantity(material.id, 1, currentUser.email);
   };
 
-  React.useEffect(() => {
-    console.log('Menu open for material id:', menuOpenFor);
-  }, [menuOpenFor]);
-
   return (
     <>
       <Card>
@@ -108,6 +103,8 @@ export function MaterialsTable({
                 <TableHead>Ud. Medición</TableHead>
                 <TableHead>Cantidad</TableHead>
                 <TableHead>Descripción</TableHead>
+                <TableHead>Valor</TableHead>
+                <TableHead>Factura</TableHead>
                 <TableHead>Última Actualización</TableHead>
                 <TableHead>Actualizado Por</TableHead>
                 <TableHead className="w-[60px] text-center"><span className="sr-only">Acciones</span></TableHead>
@@ -157,6 +154,8 @@ export function MaterialsTable({
                     )}
                   </TableCell>
                   <TableCell>{material.description}</TableCell>
+                  <TableCell>{material.valor !== null ? `${material.valor} €` : '—'}</TableCell>
+                  <TableCell>{material.factura ?? '—'}</TableCell>
                   <TableCell className="text-right">
                     {material.lastUpdated && typeof material.lastUpdated === 'string' && !isNaN(Date.parse(material.lastUpdated))
                       ? formatDistanceToNow(parseISO(material.lastUpdated), { addSuffix: true, locale: es })
@@ -170,7 +169,6 @@ export function MaterialsTable({
                       <DropdownMenu
                         open={menuOpenFor === material.id}
                         onOpenChange={(open) => {
-                          console.log(`DropdownMenu for id ${material.id} open:`, open);
                           if (open) {
                             setMenuOpenFor(material.id);
                             setDeletingMaterialId(null);
@@ -188,15 +186,12 @@ export function MaterialsTable({
                             <MoreHorizontal className="h-5 w-5 text-red-700" />
                           </Button>
                         </DropdownMenuTrigger>
-
-
                         <DropdownMenuContent
                           align="end"
                           sideOffset={5}
                           className="bg-white border rounded shadow-md z-[1000]"
                         >
                           <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-
                           <DropdownMenuItem
                             onClick={() => {
                               setEditingMaterial(material);
@@ -207,7 +202,6 @@ export function MaterialsTable({
                             <Edit2 className="h-4 w-4" />
                             Editar
                           </DropdownMenuItem>
-
                           <DropdownMenuItem
                             onClick={() => {
                               setDeletingMaterialId(material.id);

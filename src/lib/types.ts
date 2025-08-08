@@ -2,7 +2,9 @@ export interface Material {
   id: number;
   name: string;
   quantity: number;
-  category: string | null; 
+  category: string | null;
+  valor: number | null;
+  factura: string | null; 
   lastUpdated?: string | null; 
   updatedBy?: string | null;
   description: string | null;

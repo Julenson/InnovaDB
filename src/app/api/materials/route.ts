@@ -15,13 +15,41 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, category, quantity, lastUpdated, updatedBy, description } = await request.json();
+    const {
+      name,
+      category,
+      quantity,
+      valor,
+      factura,
+      lastUpdated,
+      updatedBy,
+      description,
+    } = await request.json();
 
     if (!name || quantity === undefined || quantity < 0) {
-      return NextResponse.json({ error: 'Name and non-negative quantity are required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Name and non-negative quantity are required' },
+        { status: 400 }
+      );
     }
 
-    const newMaterial = await addMaterial(name, quantity, category, description, updatedBy, lastUpdated);
+    if (valor === undefined || valor < 0) {
+      return NextResponse.json(
+        { error: 'Valor (price) is required and must be non-negative' },
+        { status: 400 }
+      );
+    }
+
+    const newMaterial = await addMaterial(
+      name,
+      quantity,
+      valor,
+      factura || null,
+      category || null,
+      description || null,
+      updatedBy || 'Desconocido',
+      lastUpdated
+    );
     return NextResponse.json(newMaterial, { status: 201 });
   } catch (error) {
     console.error('Error añadiendo material:', error);
@@ -31,22 +59,47 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { id, name, category, quantity, description, updatedBy, lastUpdated } = await request.json();
-
-    if (!id || !updatedBy) {
-      return NextResponse.json({ error: 'ID and updatedBy are required' }, { status: 400 });
-    }
-
-    if (quantity !== undefined && quantity < 0) {
-      return NextResponse.json({ error: 'Quantity cannot be negative' }, { status: 400 });
-    }
-
-    const updatedMaterial = await updateMaterial({
+    const {
       id,
       name,
       category,
       quantity,
+      valor,
+      factura,
       description,
+      updatedBy,
+      lastUpdated,
+    } = await request.json();
+
+    if (!id || !updatedBy) {
+      return NextResponse.json(
+        { error: 'ID and updatedBy are required' },
+        { status: 400 }
+      );
+    }
+
+    if (quantity !== undefined && quantity < 0) {
+      return NextResponse.json(
+        { error: 'Quantity cannot be negative' },
+        { status: 400 }
+      );
+    }
+
+    if (valor !== undefined && valor < 0) {
+      return NextResponse.json(
+        { error: 'Valor (price) cannot be negative' },
+        { status: 400 }
+      );
+    }
+
+    const updatedMaterial = await updateMaterial({
+      id,
+      name: name ?? null,
+      category: category ?? null,
+      quantity: quantity ?? null,
+      valor: valor ?? null,
+      factura: factura ?? null,
+      description: description ?? null,
       updatedBy,
       lastUpdated,
     });

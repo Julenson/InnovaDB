@@ -62,7 +62,9 @@ export default function DashboardPage() {
         material.category?.toLowerCase().includes(term) ||
         material.description?.toLowerCase().includes(term) ||
         material.updatedBy?.toLowerCase().includes(term) ||
-        material.quantity.toString().includes(term)
+        material.quantity.toString().includes(term) ||
+        (material.valor !== undefined && material.valor !== null && material.valor.toString().includes(term)) ||
+        (material.factura ?? '').toLowerCase().includes(term)
       );
     })
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -103,6 +105,8 @@ export default function DashboardPage() {
       quantity: newQuantity,
       updatedBy,
       lastUpdated: new Date().toISOString(),
+      valor: material.valor,
+      factura: material.factura,
     };
 
     const token = localStorage.getItem('token');
@@ -126,6 +130,8 @@ export default function DashboardPage() {
                   quantity: updated.quantity,
                   updatedBy: updated.updatedBy,
                   lastUpdated: updated.lastUpdated,
+                  valor: updated.valor,
+                  factura: updated.factura,
                 }
               : m
           )
@@ -153,6 +159,8 @@ export default function DashboardPage() {
       quantity: material.quantity,
       category: material.category,
       description: material.description,
+      valor: material.valor,
+      factura: material.factura,
       updatedBy: currentUser?.email || 'Desconocido',
       lastUpdated: new Date().toISOString(),
     };
@@ -239,6 +247,8 @@ export default function DashboardPage() {
           quantity: newQuantity,
           updatedBy: currentUser?.email || 'Desconocido',
           lastUpdated: new Date().toISOString(),
+          valor: pendingAddMaterial.valor ?? duplicate.valor,
+          factura: pendingAddMaterial.factura ?? duplicate.factura,
         });
         setIsAddDialogOpen(false);
       }

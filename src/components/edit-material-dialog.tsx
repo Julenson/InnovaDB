@@ -27,24 +27,33 @@ export function EditMaterialDialog({ material, onSave, onClose, open }: Props) {
     category: material.category || '',
     quantity: material.quantity,
     description: material.description || '',
+    valor: material.valor ?? null,
+    factura: material.factura || '',
   });
 
   const { data: session } = useSession();
   const currentUser = session?.user;
 
-  // Sincronizar estado cuando cambie el material
   React.useEffect(() => {
     setForm({
       name: material.name || '',
       category: material.category || '',
       quantity: material.quantity,
       description: material.description || '',
+      valor: material.valor ?? null,
+      factura: material.factura || '',
     });
   }, [material]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    const parsedValue = name === 'quantity' ? parseFloat(value) || 0 : value;
+    let parsedValue: string | number = value;
+
+    if (name === 'quantity' || name === 'valor') {
+      parsedValue = parseFloat(value);
+      if (isNaN(parsedValue)) parsedValue = 0;
+    }
+
     setForm((prev) => ({ ...prev, [name]: parsedValue }));
   };
 
@@ -55,7 +64,7 @@ export function EditMaterialDialog({ material, onSave, onClose, open }: Props) {
       lastUpdated: new Date().toISOString(),
       ...form,
     });
-    onClose(); // cerrar después de guardar
+    onClose();
   };
 
   return (
@@ -75,11 +84,35 @@ export function EditMaterialDialog({ material, onSave, onClose, open }: Props) {
           </div>
           <div>
             <Label>Cantidad</Label>
-            <Input name="quantity" type="number" step="0.01" value={form.quantity} onChange={handleChange} />
+            <Input
+              name="quantity"
+              type="number"
+              step="0.01"
+              value={form.quantity}
+              onChange={handleChange}
+            />
           </div>
           <div>
             <Label>Descripción</Label>
             <Textarea name="description" value={form.description} onChange={handleChange} />
+          </div>
+          <div>
+            <Label>Valor (€)</Label>
+            <Input
+              name="valor"
+              type="number"
+              step="0.01"
+              value={form.valor ?? ''}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <Label>Nº de factura</Label>
+            <Input
+              name="factura"
+              value={form.factura}
+              onChange={handleChange}
+            />
           </div>
         </div>
         <DialogFooter className="mt-4">

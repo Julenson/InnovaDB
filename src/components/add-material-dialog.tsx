@@ -98,11 +98,49 @@ export function AddMaterialDialog({ trigger, open, onOpenChange, onAdd }: AddMat
             </label>
             <input
               id="description"
-              {...register('description')} /* ← aquí ya no es obligatorio */
+              {...register('description')}
               className="mt-2 block w-full rounded-md border border-border bg-card px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
             />
             {errors.description && (
               <p className="mt-1 text-xs text-destructive">{errors.description.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="valor" className="block text-sm font-medium leading-6 text-foreground">
+              Valor (€)
+            </label>
+            <input
+              id="valor"
+              type="number"
+              step="0.01"
+              {...register('valor', {
+                valueAsNumber: true,
+                min: { value: 0, message: 'El valor no puede ser negativo' },
+                validate: (value) => {
+                  if (value === null || value === undefined || isNaN(value)) return true;
+                  const decimals = value.toString().split('.')[1];
+                  return !decimals || decimals.length <= 2 || 'Máximo 2 decimales permitidos';
+                },
+              })}
+              className="mt-2 block w-full rounded-md border border-border bg-card px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
+            />
+            {errors.valor && (
+              <p className="mt-1 text-xs text-destructive">{errors.valor.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="factura" className="block text-sm font-medium leading-6 text-foreground">
+              Nº de factura
+            </label>
+            <input
+              id="factura"
+              {...register('factura')}
+              className="mt-2 block w-full rounded-md border border-border bg-card px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
+            />
+            {errors.factura && (
+              <p className="mt-1 text-xs text-destructive">{errors.factura.message}</p>
             )}
           </div>
 
