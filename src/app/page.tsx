@@ -13,40 +13,54 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Logo from '@/assets/logo.svg';
+import { TokenExpiredError } from 'jsonwebtoken';
 
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  e.preventDefault();
+  setError(null);
 
-    const form = e.currentTarget as HTMLFormElement;
-    const formData = new FormData(form);
-    const email = (formData.get('email') as string).toLowerCase();
-    const password = formData.get('password') as string;
+  const form = e.currentTarget as HTMLFormElement;
+  const formData = new FormData(form);
+  const email = (formData.get('email') as string).toLowerCase();
+  const password = formData.get('password') as string;
 
-    try {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
 
-      if (!res.ok) {
-        const data = await res.json();
-        setError(data.error || 'Error desconocido');
-        return;
-      }
-
+    if (!res.ok) {
       const data = await res.json();
-      localStorage.setItem('token', data.token);
-      router.push('/select-table');
-    } catch {
-      setError('Error en la conexión');
+      setError(data.error || 'Error desconocido');
+      return;
     }
-  };
+
+    const data = await res.json();
+    const token = data.token;
+    localStorage.setItem('token', token);
+
+    // Decodificamos el JWT para ver la categoría del usuario
+    const [, payloadBase64] = token.split('.');
+    const payload = JSON.parse(atob(payloadBase64));
+    const role = (payload.category || '').trim().toLowerCase();
+
+    // Solo permitimos acceso si es developer u owner
+    if (['developer', 'owner'].includes(role)) {
+      router.push('/select-table');
+    } else {
+      router.push('/dashboard/materials');
+    }
+  } catch {
+    setError('Error en la conexión');
+  }
+};
+
 
   return (
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">

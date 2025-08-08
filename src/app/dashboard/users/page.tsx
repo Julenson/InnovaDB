@@ -126,8 +126,10 @@ export default function UsersDashboardPage() {
       });
 
       if (res.ok) {
-        // No recibes el usuario actualizado, actualiza localmente
-        setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, ...user } : u)));
+        const updated = await res.json();
+        setUsers((prev) =>
+          prev.map((u) => (u.id === user.id ? { ...u, ...updated } : u))
+        );
       } else {
         console.error('Error actualizando usuario');
       }
@@ -309,7 +311,10 @@ export default function UsersDashboardPage() {
             user={editUser}
             open={isEditDialogOpen}
             onClose={closeEditDialog}
-            onSave={async (updatedUser) => {
+            onSave={async (updatedFields) => {
+              if (!editUser) return;
+              // Aquí combinas el usuario actual con los campos nuevos
+              const updatedUser = { ...editUser, ...updatedFields };
               await handleUpdateUser(updatedUser);
               closeEditDialog();
             }}
