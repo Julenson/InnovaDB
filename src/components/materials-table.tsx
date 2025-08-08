@@ -67,7 +67,8 @@ export function MaterialsTable({
   currentUser,
   currentUserRole,
 }: MaterialsTableProps) {
-  const canEdit = ['admin', 'owner', 'developer', 'employee'].includes(currentUserRole);
+  const role = currentUserRole?.trim().toLowerCase();
+  const canEdit = ['admin', 'owner', 'developer', 'employee'].includes(role);
   const [editingMaterial, setEditingMaterial] = React.useState<Material | null>(null);
   const [deletingMaterialId, setDeletingMaterialId] = React.useState<number | null>(null);
   const [menuOpenFor, setMenuOpenFor] = React.useState<number | null>(null);

@@ -250,13 +250,6 @@ export default function DashboardPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Inventario de materiales</h1>
-        <button
-          className="btn-primary"
-          onClick={() => setIsAddDialogOpen(true)}
-          aria-label="Agregar material"
-        >
-          + Agregar material
-        </button>
       </div>
 
       <input
@@ -278,7 +271,7 @@ export default function DashboardPage() {
         }}
         onUpdateMaterial={handleUpdateMaterial}
       />
-      
+
       {showDuplicateDialog && (
         <div
           role="dialog"
@@ -307,6 +300,21 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      <AddMaterialDialog
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+        onAdd={handleAddMaterial}
+        trigger={
+          <button
+            className="btn-primary"
+            aria-label="Agregar material"
+            type="button"
+          >
+            + Agregar material
+          </button>
+        }
+      />
     </div>
   );
 }
