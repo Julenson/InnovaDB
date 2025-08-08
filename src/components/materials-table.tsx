@@ -34,7 +34,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import type { Material, User } from '@/lib/types';
 import { formatDistanceToNow, parseISO } from 'date-fns';
@@ -75,9 +74,7 @@ export function MaterialsTable({
 
   const handleSubtract = async (material: Material) => {
     if (!currentUser) return;
-
     const result = await onUpdateQuantity(material.id, -1, currentUser.email);
-
     if (result === 'zero') {
       setDeletingMaterialId(material.id);
     }
@@ -87,6 +84,11 @@ export function MaterialsTable({
     if (!currentUser) return;
     await onUpdateQuantity(material.id, 1, currentUser.email);
   };
+
+  // Debug console log to check menu open state
+  React.useEffect(() => {
+    console.log('Menu open for material id:', menuOpenFor);
+  }, [menuOpenFor]);
 
   return (
     <>
@@ -167,6 +169,7 @@ export function MaterialsTable({
                       <DropdownMenu
                         open={menuOpenFor === material.id}
                         onOpenChange={(open) => {
+                          console.log(`DropdownMenu for id ${material.id} open:`, open);
                           if (open) {
                             setMenuOpenFor(material.id);
                             setDeletingMaterialId(null);
@@ -188,7 +191,7 @@ export function MaterialsTable({
                         <DropdownMenuContent
                           align="end"
                           sideOffset={5}
-                          className="bg-white border rounded shadow-md z-50"
+                          className="bg-white border rounded shadow-md z-[1000]"
                         >
                           <DropdownMenuLabel>Acciones</DropdownMenuLabel>
 
@@ -224,7 +227,6 @@ export function MaterialsTable({
         </CardContent>
       </Card>
 
-      {/* Diálogo para editar material */}
       {editingMaterial && (
         <EditMaterialDialog
           material={editingMaterial}
@@ -234,7 +236,6 @@ export function MaterialsTable({
         />
       )}
 
-      {/* Diálogo para confirmar eliminación */}
       <AlertDialog
         open={deletingMaterialId !== null}
         onOpenChange={(open) => {
