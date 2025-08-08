@@ -185,16 +185,32 @@ export function MaterialsTable({
                           </Button>
                         </DropdownMenuTrigger>
 
-                        <DropdownMenuContent align="end" className="bg-white border rounded shadow-md">
+                        <DropdownMenuContent
+                          align="end"
+                          sideOffset={5}
+                          className="bg-white border rounded shadow-md z-50"
+                        >
                           <DropdownMenuLabel>Acciones</DropdownMenuLabel>
 
-                          <DropdownMenuItem onClick={() => alert(`Editar ${material.name}`)}>
-                            <Edit2 className="mr-2 h-4 w-4" />
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setEditingMaterial(material);
+                              setMenuOpenFor(null);
+                            }}
+                            className="flex items-center gap-2"
+                          >
+                            <Edit2 className="h-4 w-4" />
                             Editar
                           </DropdownMenuItem>
 
-                          <DropdownMenuItem onClick={() => alert(`Eliminar ${material.name}`)}>
-                            <Trash2 className="mr-2 h-4 w-4" />
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setDeletingMaterialId(material.id);
+                              setMenuOpenFor(null);
+                            }}
+                            className="text-destructive flex items-center gap-2"
+                          >
+                            <Trash2 className="h-4 w-4" />
                             Eliminar
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -207,6 +223,8 @@ export function MaterialsTable({
           </Table>
         </CardContent>
       </Card>
+
+      {/* Diálogo para editar material */}
       {editingMaterial && (
         <EditMaterialDialog
           material={editingMaterial}
@@ -215,6 +233,38 @@ export function MaterialsTable({
           open={!!editingMaterial}
         />
       )}
+
+      {/* Diálogo para confirmar eliminación */}
+      <AlertDialog
+        open={deletingMaterialId !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeletingMaterialId(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Seguro que quieres eliminar?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deletingMaterialId !== null) {
+                  onRemove(deletingMaterialId);
+                  setDeletingMaterialId(null);
+                  setMenuOpenFor(null);
+                }
+              }}
+              className="bg-destructive text-white hover:bg-destructive/90"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
