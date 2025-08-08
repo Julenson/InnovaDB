@@ -207,7 +207,7 @@ export default function UsersDashboardPage() {
     setShowDuplicateDialog(false);
   }
 
-  const isAuthorized = ['admin', 'developer'].includes(currentUserRole);
+  const isAuthorized = ['owner', 'developer'].includes(currentUserRole);
 
   // NUEVAS funciones para eliminar usuario con diálogo interno
   const openDeleteDialog = (user: User) => setUserToDelete(user);
