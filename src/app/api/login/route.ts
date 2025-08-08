@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     await connectClient();
 
     const result = await client.query(
-      'SELECT * FROM users WHERE mail = $1 AND password = $2',
+      'SELECT * FROM users WHERE email = $1 AND password = $2',
       [email, password]
     );
 
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
 
     // Aquí usamos el "!" para asegurar a TS que JWT_SECRET no es undefined
     const token = jwt.sign(
-      { id: user.id, email: user.mail, category: user.category },
+      { id: user.id, email: user.email, category: user.category },
       JWT_SECRET!,
       { expiresIn: '8h' }
     );
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       message: 'Login correcto',
       user: {
         id: user.id,
-        email: user.mail,
+        email: user.email,
         category: user.category,
         name: user.name || '',
       },

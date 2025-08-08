@@ -22,7 +22,7 @@ export default function DashboardPage() {
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
       try {
-        const userRes = await fetch('/api/user', { headers });
+        const userRes = await fetch('/api/users', { headers });
         if (userRes.ok) {
           const userData = await userRes.json();
           setCurrentUser(userData);
