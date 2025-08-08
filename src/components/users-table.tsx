@@ -8,16 +8,16 @@ interface UsersTableProps {
   users: User[];
   currentUserRole: string;
   currentUser: User | null;
-  onRemove: (id: number) => void;
   onEdit: (user: User) => void;
+  onDelete: (user: User) => void; // Nuevo callback para abrir diálogo de eliminación
 }
 
 export function UsersTable({
   users,
   currentUserRole,
   currentUser,
-  onRemove,
   onEdit,
+  onDelete,
 }: UsersTableProps) {
   const [visiblePasswords, setVisiblePasswords] = useState<Set<number>>(new Set());
 
@@ -31,9 +31,7 @@ export function UsersTable({
 
   if (!users || users.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
-        No hay usuarios para mostrar.
-      </div>
+      <div className="text-center py-8 text-gray-500">No hay usuarios para mostrar.</div>
     );
   }
 
@@ -60,7 +58,7 @@ export function UsersTable({
                   <span className="font-mono select-none">
                     {isVisible
                       ? user.password ?? '[oculta]'
-                      : '•'.repeat((user.password?.length || 8))}
+                      : '•'.repeat(user.password?.length || 8)}
                   </span>
                   <button
                     onClick={() => togglePasswordVisibility(user.id)}
@@ -81,14 +79,7 @@ export function UsersTable({
                   </button>
                   <button
                     className="text-red-600 hover:underline cursor-pointer"
-                    onClick={() => {
-                      const confirmDelete = window.confirm(
-                        `¿Estás seguro de que deseas eliminar al usuario ${user.email}?`
-                      );
-                      if (confirmDelete) {
-                        onRemove(user.id);
-                      }
-                    }}
+                    onClick={() => onDelete(user)} // Abrir diálogo interno
                     aria-label={`Eliminar usuario ${user.email}`}
                   >
                     Eliminar

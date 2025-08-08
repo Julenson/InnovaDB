@@ -5,6 +5,15 @@ import { UsersTable } from '@/components/users-table';
 import { EditUserDialog } from '@/components/edit-user-dialog';
 import type { User } from '@/lib/types';
 import { AddUserDialog } from '@/components/add-user-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 export default function UsersDashboardPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -17,6 +26,8 @@ export default function UsersDashboardPage() {
 
   const [editUser, setEditUser] = useState<User | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   useEffect(() => {
     async function fetchCurrentUser() {
@@ -76,20 +87,26 @@ export default function UsersDashboardPage() {
     .sort((a, b) => a.id - b.id);
 
   async function handleRemove(id: number) {
-    const confirm = window.confirm('¿Estás seguro de que deseas eliminar este usuario?');
-    if (!confirm) return;
-
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No token found');
+      return;
+    }
     try {
       const res = await fetch('/api/users', {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ id }),
       });
 
       if (res.ok) {
         setUsers((prev) => prev.filter((u) => u.id !== id));
       } else {
-        console.error('Error al eliminar el usuario');
+        const errorData = await res.json();
+        console.error('Error al eliminar usuario:', errorData.error);
       }
     } catch (error) {
       console.error('Error en handleRemove:', error);
@@ -109,8 +126,8 @@ export default function UsersDashboardPage() {
       });
 
       if (res.ok) {
-        const updated = await res.json();
-        setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, ...updated } : u)));
+        // No recibes el usuario actualizado, actualiza localmente
+        setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, ...user } : u)));
       } else {
         console.error('Error actualizando usuario');
       }
@@ -190,6 +207,16 @@ export default function UsersDashboardPage() {
 
   const isAuthorized = ['admin', 'developer'].includes(currentUserRole);
 
+  // NUEVAS funciones para eliminar usuario con diálogo interno
+  const openDeleteDialog = (user: User) => setUserToDelete(user);
+  const closeDeleteDialog = () => setUserToDelete(null);
+
+  async function confirmDeleteUser() {
+    if (!userToDelete) return;
+    await handleRemove(userToDelete.id);
+    closeDeleteDialog();
+  }
+
   return (
     <div className="p-6 flex justify-center">
       <div className="w-full max-w-4xl">
@@ -219,8 +246,8 @@ export default function UsersDashboardPage() {
             users={filteredUsers}
             currentUserRole={currentUserRole}
             currentUser={currentUser}
-            onRemove={handleRemove}
             onEdit={openEditDialog}
+            onDelete={openDeleteDialog} // Aquí pasamos la función que abre el modal de eliminar
           />
         ) : (
           <p className="text-center text-gray-600">No tienes permisos para ver esta página.</p>
@@ -235,7 +262,8 @@ export default function UsersDashboardPage() {
             <div className="bg-white p-6 rounded shadow max-w-md w-full">
               <h2 className="text-xl font-semibold mb-4">Usuario duplicado</h2>
               <p className="mb-4">
-                Ya existe un usuario con el mismo email. ¿Quieres sobrescribir los datos existentes o cancelar?
+                Ya existe un usuario con el mismo email. ¿Quieres sobrescribir los datos existentes
+                o cancelar?
               </p>
               <div className="flex justify-end space-x-4">
                 <button className="btn-secondary" onClick={() => confirmAddDuplicate(false)}>
@@ -248,6 +276,26 @@ export default function UsersDashboardPage() {
             </div>
           </div>
         )}
+
+        {/* Diálogo modal interno para confirmar eliminación */}
+        <Dialog open={!!userToDelete} onOpenChange={(val) => !val && closeDeleteDialog()}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirmar eliminación</DialogTitle>
+            </DialogHeader>
+            <p className="mb-4">
+              ¿Seguro que quieres eliminar al usuario <strong>{userToDelete?.email}</strong>?
+            </p>
+            <DialogFooter className="mt-4">
+              <DialogClose asChild>
+                <Button variant="outline">Cancelar</Button>
+              </DialogClose>
+              <Button variant="destructive" onClick={confirmDeleteUser}>
+                Eliminar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <AddUserDialog
           open={isAddDialogOpen}
