@@ -15,7 +15,6 @@ export default function UsersDashboardPage() {
   const [pendingAddUser, setPendingAddUser] = useState<Omit<User, 'id'> | null>(null);
   const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
 
-  // Estados para editar usuario
   const [editUser, setEditUser] = useState<User | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
@@ -77,6 +76,9 @@ export default function UsersDashboardPage() {
     .sort((a, b) => a.id - b.id);
 
   async function handleRemove(id: number) {
+    const confirm = window.confirm('¿Estás seguro de que deseas eliminar este usuario?');
+    if (!confirm) return;
+
     try {
       const res = await fetch('/api/users', {
         method: 'DELETE',
@@ -117,13 +119,11 @@ export default function UsersDashboardPage() {
     }
   }
 
-  // Función para abrir diálogo editar
   const openEditDialog = (user: User) => {
     setEditUser(user);
     setIsEditDialogOpen(true);
   };
 
-  // Función para cerrar diálogo editar
   const closeEditDialog = () => {
     setEditUser(null);
     setIsEditDialogOpen(false);
@@ -256,7 +256,6 @@ export default function UsersDashboardPage() {
           trigger={null}
         />
 
-        {/* Diálogo de edición */}
         {editUser && (
           <EditUserDialog
             user={editUser}

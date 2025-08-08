@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import type { User } from '@/lib/types';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface UsersTableProps {
   users: User[];
@@ -23,17 +24,17 @@ export function UsersTable({
   const togglePasswordVisibility = (id: number) => {
     setVisiblePasswords((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
+      newSet.has(id) ? newSet.delete(id) : newSet.add(id);
       return newSet;
     });
   };
 
   if (!users || users.length === 0) {
-    return <div className="text-center py-8 text-gray-500">No hay usuarios para mostrar.</div>;
+    return (
+      <div className="text-center py-8 text-gray-500">
+        No hay usuarios para mostrar.
+      </div>
+    );
   }
 
   return (
@@ -55,14 +56,19 @@ export function UsersTable({
               <tr key={user.id} className="text-center">
                 <td className="px-4 py-2 border">{user.id}</td>
                 <td className="px-4 py-2 border">{user.email}</td>
-                <td
-                  className="px-4 py-2 border cursor-pointer select-none"
-                  onClick={() => togglePasswordVisibility(user.id)}
-                  title={isVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                  style={{ userSelect: 'none' }}
-                  aria-label={isVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                >
-                  {isVisible ? user.password : '••••••••'}
+                <td className="px-4 py-2 border flex justify-center items-center gap-2">
+                  <span className="font-mono select-none">
+                    {isVisible
+                      ? user.password ?? '[oculta]'
+                      : '•'.repeat((user.password?.length || 8))}
+                  </span>
+                  <button
+                    onClick={() => togglePasswordVisibility(user.id)}
+                    aria-label={isVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                    title={isVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  >
+                    {isVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </td>
                 <td className="px-4 py-2 border">{user.category}</td>
                 <td className="px-4 py-2 border space-x-2">
