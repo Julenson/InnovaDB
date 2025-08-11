@@ -93,135 +93,139 @@ export function MaterialsTable({
           <CardDescription>Gestiona el inventario con facilidad desde aquí.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="hidden w-[100px] sm:table-cell">
-                  <span className="sr-only">Imagen</span>
-                </TableHead>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Ud. Medición</TableHead>
-                <TableHead>Cantidad</TableHead>
-                <TableHead>Descripción</TableHead>
-                <TableHead>Valor</TableHead>
-                <TableHead>Factura</TableHead>
-                <TableHead>Último Destino</TableHead>
-                <TableHead>Última Actualización</TableHead>
-                <TableHead>Actualizado Por</TableHead>
-                <TableHead className="w-[60px] text-center"><span className="sr-only">Acciones</span></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {materials.map((material) => (
-                <TableRow key={material.id}>
-                  <TableCell className="hidden sm:table-cell">
-                    <div className="w-16 h-16 bg-muted rounded-md flex items-center justify-center">
-                      <span className="text-2xl font-bold text-muted-foreground">
-                        {material.name.charAt(0)}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium">{material.name}</TableCell>
-                  <TableCell>
-                    {material.category && <Badge variant="outline">{material.category}</Badge>}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {canEdit ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => handleSubtract(material)}
-                          disabled={material.quantity <= 0 || !currentUser}
-                          aria-label={`Restar cantidad de ${material.name}`}
-                        >
-                          <Minus className="h-4 w-4" />
-                        </Button>
-                        <span>{formatQuantity(material.quantity)}</span>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => handleAdd(material)}
-                          disabled={!currentUser}
-                          aria-label={`Sumar cantidad de ${material.name}`}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <span>{formatQuantity(material.quantity)}</span>
-                    )}
-                  </TableCell>
-                  <TableCell>{material.description}</TableCell>
-                  <TableCell>{material.valor !== null ? `${material.valor} €` : '—'}</TableCell>
-                  <TableCell>{material.factura ?? '—'}</TableCell>
-                  <TableCell>{material.lastDestiny ?? '—'}</TableCell>
-                  <TableCell className="text-right">
-                    {material.lastUpdated && typeof material.lastUpdated === 'string' && !isNaN(Date.parse(material.lastUpdated))
-                      ? formatDistanceToNow(parseISO(material.lastUpdated), { addSuffix: true, locale: es })
-                      : '—'}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {material.updatedBy && material.updatedBy.trim() !== '' ? material.updatedBy : '—'}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {canEdit && (
-                      <DropdownMenu
-                        open={menuOpenFor === material.id}
-                        onOpenChange={(open) => {
-                          if (open) {
-                            setMenuOpenFor(material.id);
-                            setDeletingMaterialId(null);
-                          } else {
-                            setMenuOpenFor(null);
-                          }
-                        }}
-                      >
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            className="h-8 w-8 p-0 bg-transparent border border-red-600"
-                            aria-label={`Abrir menú de acciones para ${material.name}`}
-                          >
-                            <MoreHorizontal className="h-5 w-5 text-red-700" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          sideOffset={5}
-                          className="bg-white border rounded shadow-md z-[1000]"
-                        >
-                          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setEditingMaterial(material);
-                              setMenuOpenFor(null);
-                            }}
-                            className="flex items-center gap-2"
-                          >
-                            <Edit2 className="h-4 w-4" />
-                            Editar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setDeletingMaterialId(material.id);
-                              setMenuOpenFor(null);
-                            }}
-                            className="text-destructive flex items-center gap-2"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            Eliminar
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </TableCell>
+          <div className="max-h-[400px] overflow-auto">
+            <Table className="min-w-full border-collapse">
+              <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
+                <TableRow>
+                  <TableHead className="hidden w-[100px] sm:table-cell">
+                    <span className="sr-only">Imagen</span>
+                  </TableHead>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Ud. Medición</TableHead>
+                  <TableHead>Cantidad</TableHead>
+                  <TableHead>Descripción</TableHead>
+                  <TableHead>Valor</TableHead>
+                  <TableHead>Factura</TableHead>
+                  <TableHead>Último Destino</TableHead>
+                  <TableHead>Última Actualización</TableHead>
+                  <TableHead>Actualizado Por</TableHead>
+                  <TableHead className="w-[60px] text-center">
+                    <span className="sr-only">Acciones</span>
+                  </TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {materials.map((material) => (
+                  <TableRow key={material.id}>
+                    <TableCell className="hidden sm:table-cell">
+                      <div className="w-16 h-16 bg-muted rounded-md flex items-center justify-center">
+                        <span className="text-2xl font-bold text-muted-foreground">
+                          {material.name.charAt(0)}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium">{material.name}</TableCell>
+                    <TableCell>
+                      {material.category && <Badge variant="outline">{material.category}</Badge>}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {canEdit ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => handleSubtract(material)}
+                            disabled={material.quantity <= 0 || !currentUser}
+                            aria-label={`Restar cantidad de ${material.name}`}
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          <span>{formatQuantity(material.quantity)}</span>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => handleAdd(material)}
+                            disabled={!currentUser}
+                            aria-label={`Sumar cantidad de ${material.name}`}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <span>{formatQuantity(material.quantity)}</span>
+                      )}
+                    </TableCell>
+                    <TableCell>{material.description}</TableCell>
+                    <TableCell>{material.valor !== null ? `${material.valor} €` : '—'}</TableCell>
+                    <TableCell>{material.factura ?? '—'}</TableCell>
+                    <TableCell>{material.lastDestiny ?? '—'}</TableCell>
+                    <TableCell className="text-right">
+                      {material.lastUpdated && typeof material.lastUpdated === 'string' && !isNaN(Date.parse(material.lastUpdated))
+                        ? formatDistanceToNow(parseISO(material.lastUpdated), { addSuffix: true, locale: es })
+                        : '—'}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {material.updatedBy && material.updatedBy.trim() !== '' ? material.updatedBy : '—'}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {canEdit && (
+                        <DropdownMenu
+                          open={menuOpenFor === material.id}
+                          onOpenChange={(open) => {
+                            if (open) {
+                              setMenuOpenFor(material.id);
+                              setDeletingMaterialId(null);
+                            } else {
+                              setMenuOpenFor(null);
+                            }
+                          }}
+                        >
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              className="h-8 w-8 p-0 bg-transparent border border-red-600"
+                              aria-label={`Abrir menú de acciones para ${material.name}`}
+                            >
+                              <MoreHorizontal className="h-5 w-5 text-red-700" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            sideOffset={5}
+                            className="bg-white border rounded shadow-md z-[1000]"
+                          >
+                            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setEditingMaterial(material);
+                                setMenuOpenFor(null);
+                              }}
+                              className="flex items-center gap-2"
+                            >
+                              <Edit2 className="h-4 w-4" />
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setDeletingMaterialId(material.id);
+                                setMenuOpenFor(null);
+                              }}
+                              className="text-destructive flex items-center gap-2"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              Eliminar
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
