@@ -93,9 +93,9 @@ export function MaterialsTable({
           <CardDescription>Gestiona el inventario con facilidad desde aquí.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="max-h-[400px] overflow-auto">
+          <div className="relative max-h-[400px] overflow-auto">
             <Table className="min-w-full border-collapse">
-              <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
+              <TableHeader className="sticky top-0 bg-white z-20 shadow-sm">
                 <TableRow>
                   <TableHead className="hidden w-[100px] sm:table-cell">
                     <span className="sr-only">Imagen</span>
@@ -225,6 +225,13 @@ export function MaterialsTable({
                 ))}
               </TableBody>
             </Table>
+            {/* Sticky horizontal scrollbar container */}
+            <div
+              className="absolute bottom-0 left-0 right-0 overflow-x-auto overflow-y-hidden"
+              style={{ height: '1.5rem' }}
+            >
+              <div style={{ width: 'max-content', minWidth: '100%' }} />
+            </div>
           </div>
         </CardContent>
       </Card>

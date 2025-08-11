@@ -1,19 +1,12 @@
 'use client';
 
-import * as React from "react";
-import { MoreHorizontal, Trash2, Edit2 } from "lucide-react";
+import React, { useEffect, useState } from 'react';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-} from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -21,10 +14,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { AddObraDialog } from "@/components/add-obra-dialog"; 
-import { EditObraDialog } from "@/components/edit-obra-dialog";
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,94 +31,113 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 
-import type { Obra } from "@/lib/types";
-import Header from "@/components/header";
+import { AddObraDialog } from '@/components/add-obra-dialog';
+import { EditObraDialog } from '@/components/edit-obra-dialog';
+import Header from '@/components/header';
+
+import type { Obra } from '@/lib/types';
+import { Edit2, MoreHorizontal, Trash2 } from 'lucide-react';
 
 export default function ObrasPage() {
-  const [data, setData] = React.useState<Obra[]>([]);
-  const [search, setSearch] = React.useState("");
-  const [openAddObra, setOpenAddObra] = React.useState(false);
-  const [editingObra, setEditingObra] = React.useState<Obra | null>(null);
-  const [deletingObra, setDeletingObra] = React.useState<Obra | null>(null);
-  const [deleteError, setDeleteError] = React.useState<string | null>(null);
+  const [obras, setObras] = useState<Obra[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingObra, setEditingObra] = useState<Obra | null>(null);
+  const [deletingObra, setDeletingObra] = useState<Obra | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  React.useEffect(() => {
-    fetch("/api/obras")
-      .then((res) => res.json())
-      .then((data) => setData(data.obras))
-      .catch((err) => console.error(err));
+  useEffect(() => {
+    async function fetchObras() {
+      try {
+        const res = await fetch('/api/obras');
+        if (res.ok) {
+          const json = await res.json();
+          setObras(json.obras);
+        } else {
+          console.error('Error al obtener obras');
+        }
+      } catch (error) {
+        console.error('Error fetching obras:', error);
+      }
+    }
+
+    fetchObras();
   }, []);
 
-  const filteredData = data.filter((obra) => {
-    const lowerSearch = search.toLowerCase();
+  // Filtrado sencillo
+  const filteredObras = obras.filter((obra) => {
+    const term = searchTerm.toLowerCase();
     return (
-      obra.obra.toLowerCase().includes(lowerSearch) ||
-      obra.email.toLowerCase().includes(lowerSearch) ||
-      obra.provincia.toLowerCase().includes(lowerSearch) ||
-      obra.localidad.toLowerCase().includes(lowerSearch) ||
-      obra.contacto.toLowerCase().includes(lowerSearch)
+      obra.obra.toLowerCase().includes(term) ||
+      obra.email.toLowerCase().includes(term) ||
+      obra.provincia.toLowerCase().includes(term) ||
+      obra.localidad.toLowerCase().includes(term) ||
+      obra.contacto.toLowerCase().includes(term)
     );
   });
 
-  const handleAddObra = async (newObra: Omit<Obra, "id">) => {
+  // Añadir obra
+  async function handleAddObra(newObra: Omit<Obra, 'id'>) {
     try {
-      const res = await fetch("/api/obras", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/obras', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newObra),
       });
-      if (!res.ok) throw new Error("Error al guardar obra");
+      if (!res.ok) throw new Error('Error al guardar obra');
       const json = await res.json();
-      setData((prev) => [...prev, json.obra]);
-      setOpenAddObra(false);
+      setObras((prev) => [...prev, json.obra]);
+      setIsAddDialogOpen(false);
     } catch (error) {
       console.error(error);
-      alert("Error al agregar obra");
+      alert('Error al agregar obra');
     }
-  };
+  }
 
-  const handleUpdateObra = async (updatedObra: Obra) => {
+  // Actualizar obra
+  async function handleUpdateObra(updatedObra: Obra) {
     try {
-      const res = await fetch("/api/obras", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/obras', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedObra),
       });
-      if (!res.ok) throw new Error("Error al actualizar obra");
+      if (!res.ok) throw new Error('Error al actualizar obra');
       const json = await res.json();
-      setData((prev) =>
+      setObras((prev) =>
         prev.map((obra) => (obra.id === json.obra.id ? json.obra : obra))
       );
       setEditingObra(null);
     } catch (error) {
       console.error(error);
-      alert("Error al actualizar obra");
+      alert('Error al actualizar obra');
     }
-  };
+  }
 
-  const handleDelete = async () => {
+  // Eliminar obra
+  async function handleDelete() {
     if (!deletingObra) return;
 
     try {
-      const res = await fetch("/api/obras", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/obras', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: deletingObra.id }),
       });
       if (!res.ok) {
         const json = await res.json();
-        throw new Error(json.error || "Error al eliminar obra");
+        throw new Error(json.error || 'Error al eliminar obra');
       }
-      setData((prev) => prev.filter((obra) => obra.id !== deletingObra.id));
+      setObras((prev) => prev.filter((obra) => obra.id !== deletingObra.id));
       setDeletingObra(null);
       setDeleteError(null);
     } catch (error: any) {
       console.error(error);
-      setDeleteError(error.message || "Error al eliminar obra");
+      setDeleteError(error.message || 'Error al eliminar obra');
     }
-  };
+  }
 
   return (
     <>
@@ -134,15 +150,15 @@ export default function ObrasPage() {
             <input
               type="text"
               placeholder="Buscar obra, email, provincia..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-grow rounded border border-input px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-0"
               aria-label="Buscar obra"
             />
 
             <AddObraDialog
-              open={openAddObra}
-              onOpenChange={setOpenAddObra}
+              open={isAddDialogOpen}
+              onOpenChange={setIsAddDialogOpen}
               onAdd={handleAddObra}
               trigger={
                 <Button className="whitespace-nowrap" variant="default">
@@ -170,7 +186,7 @@ export default function ObrasPage() {
             </TableHeader>
 
             <TableBody>
-              {filteredData.length === 0 ? (
+              {filteredObras.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={9}
@@ -180,7 +196,7 @@ export default function ObrasPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredData.map((obra) => (
+                filteredObras.map((obra) => (
                   <TableRow key={obra.id}>
                     <TableCell>{obra.id}</TableCell>
                     <TableCell>{obra.obra}</TableCell>
@@ -193,7 +209,11 @@ export default function ObrasPage() {
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" aria-label={`Acciones para obra ${obra.obra}`}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label={`Acciones para obra ${obra.obra}`}
+                          >
                             <MoreHorizontal size={16} />
                           </Button>
                         </DropdownMenuTrigger>
