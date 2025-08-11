@@ -44,7 +44,7 @@ export default function ObrasPage() {
   React.useEffect(() => {
     fetch("/api/obras")
       .then((res) => res.json())
-      .then((data) => setData(data))
+      .then((data) => setData(data.obras))
       .catch((err) => console.error(err));
   }, []);
 
