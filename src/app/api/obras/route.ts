@@ -1,15 +1,19 @@
 // src/app/api/obras/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  getAllObras,
-  addObra,
-  updateObra,
-  deleteObra,
-} from '@db/managedb';
+import { getAllObras, addObra, updateObra, deleteObra } from '@db/managedb';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const url = new URL(request.url);
+    const idStr = url.searchParams.get('id');
+
+    if (idStr) {
+      // Opcional: implementar get obra por id si quieres
+      // Ahora devolvemos error para simplificar
+      return NextResponse.json({ error: 'GET por id no implementado' }, { status: 400 });
+    }
+
     const obras = await getAllObras();
     return NextResponse.json({ obras });
   } catch (error) {
@@ -32,7 +36,6 @@ export async function POST(request: NextRequest) {
       lastUpdated,
     } = await request.json();
 
-    // Validaciones básicas
     if (!obra || !email) {
       return NextResponse.json(
         { error: 'Campos "obra" y "email" son obligatorios' },
@@ -59,7 +62,7 @@ export async function POST(request: NextRequest) {
       lastUpdated
     );
 
-    return NextResponse.json(newObra, { status: 201 });
+    return NextResponse.json({ obra: newObra }, { status: 201 });
   } catch (error) {
     console.error('Error adding obra:', error);
     return NextResponse.json({ error: 'Error adding obra' }, { status: 500 });
@@ -83,7 +86,7 @@ export async function PUT(request: NextRequest) {
 
     if (!id || !updatedBy) {
       return NextResponse.json(
-        { error: 'El campo "id" y "updatedBy" son obligatorios' },
+        { error: 'Los campos "id" y "updatedBy" son obligatorios' },
         { status: 400 }
       );
     }
@@ -108,7 +111,7 @@ export async function PUT(request: NextRequest) {
       lastUpdated,
     });
 
-    return NextResponse.json(updated, { status: 200 });
+    return NextResponse.json({ obra: updated }, { status: 200 });
   } catch (error) {
     console.error('Error updating obra:', error);
     return NextResponse.json({ error: 'Error updating obra' }, { status: 500 });
@@ -124,7 +127,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     await deleteObra(Number(id));
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error('Error deleting obra:', error);
     return NextResponse.json({ error: 'Error deleting obra' }, { status: 500 });
