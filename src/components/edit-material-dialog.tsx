@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { Material } from "@/lib/types";
-import { useSession } from "next-auth/react";
+import { useUser } from "@/hooks/use-user";
 
 interface Props {
   material: Material;
@@ -31,8 +31,7 @@ export function EditMaterialDialog({ material, onSave, onClose, open }: Props) {
     factura: material.factura || '',
   });
 
-  const { data: session } = useSession();
-  const currentUser = session?.user;
+  const { user: currentUser, loading } = useUser();
 
   React.useEffect(() => {
     setForm({

@@ -30,7 +30,7 @@ export default function SelectTablePage() {
       <div className="p-6 bg-white rounded shadow-lg flex flex-col items-center gap-4">
         <h1 className="text-2xl font-bold mb-2 text-center">Selecciona una tabla para gestionar</h1>
 
-        {/* Mostrar botón Usuarios SOLO para admin o developer */}
+        {/* Mostrar botón Usuarios SOLO para owner o developer */}
         {(role === 'owner' || role === 'developer') && (
           <Button className="w-48" onClick={() => router.push('/dashboard/users')}>
             Usuarios
@@ -42,7 +42,12 @@ export default function SelectTablePage() {
           Materiales
         </Button>
 
-        {/* Puedes añadir más botones aquí con sus respectivos controles de acceso */}
+        {/* Añadido botón para obras */}
+        {(role === 'owner' || role == 'developer') && (
+          <Button className="w-48" onClick={() => router.push('/dashboard/obras')}>
+            Obras
+          </Button>
+        )}
       </div>
     </div>
   );
