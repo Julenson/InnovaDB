@@ -1,6 +1,6 @@
 // db/managedb.ts
 import client, { connectClient } from '@lib/db';
-import type { Material, User } from '@lib/types';
+import type { Material, User, Obra} from '@lib/types';
 
 export async function getPostById(postId: number) {
   await connectClient();
@@ -263,4 +263,140 @@ export async function getAllUsers(): Promise<User[]> {
   await connectClient();
   const result = await client.query('SELECT id, email, password, category FROM users');
   return result.rows as User[];
+}
+
+function parseObraRow(row: any): Obra {
+  return {
+    id: row.id,
+    obra: row.obra,
+    email: row.email,
+    provincia: row.provincia,
+    localidad: row.localidad,
+    importe: parseFloat(row.importe),
+    contacto: row.contacto,
+    observaciones: row.observaciones,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+  };
+}
+
+export async function getAllObras(): Promise<Obra[]> {
+  await connectClient();
+  const result = await client.query(`
+    SELECT id, obra, email, provincia, localidad, importe, contacto, observaciones, created_at, updated_at
+    FROM obras
+  `);
+  return result.rows.map(parseObraRow);
+}
+
+export async function getObraById(id: number): Promise<Obra | undefined> {
+  await connectClient();
+  const result = await client.query(
+    `SELECT id, obra, email, provincia, localidad, importe, contacto, observaciones, created_at, updated_at
+     FROM obras WHERE id = $1`,
+    [id]
+  );
+  if (result.rows.length === 0) return undefined;
+  return parseObraRow(result.rows[0]);
+}
+
+export async function addObra(
+  obra: string,
+  email: string,
+  provincia: string | null,
+  localidad: string | null,
+  importe: number,
+  contacto: string | null,
+  observaciones: string | null,
+  updatedBy: string,
+  lastUpdated?: string
+): Promise<Obra> {
+  await connectClient();
+  importe = parseFloat(importe.toFixed(2));
+
+  const result = await client.query(
+    `INSERT INTO obras (obra, email, provincia, localidad, importe, contacto, observaciones, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+     RETURNING id, obra, email, provincia, localidad, importe, contacto, observaciones, created_at, updated_at`,
+    [obra, email, provincia, localidad, importe, contacto, observaciones, lastUpdated || new Date().toISOString()]
+  );
+
+  return parseObraRow(result.rows[0]);
+}
+
+type UpdateObraArgs = {
+  id: number;
+  obra?: string | null;
+  email?: string | null;
+  provincia?: string | null;
+  localidad?: string | null;
+  importe?: number | null;
+  contacto?: string | null;
+  observaciones?: string | null;
+  updatedBy: string;
+  lastUpdated?: string;
+};
+
+export async function updateObra({
+  id,
+  obra,
+  email,
+  provincia,
+  localidad,
+  importe,
+  contacto,
+  observaciones,
+  updatedBy,
+  lastUpdated,
+}: UpdateObraArgs): Promise<Obra> {
+  await connectClient();
+
+  const fields: string[] = [];
+  const values: any[] = [];
+
+  if (obra !== undefined && obra !== null) {
+    fields.push(`obra = $${fields.length + 1}`);
+    values.push(obra);
+  }
+  if (email !== undefined && email !== null) {
+    fields.push(`email = $${fields.length + 1}`);
+    values.push(email);
+  }
+  if (provincia !== undefined && provincia !== null) {
+    fields.push(`provincia = $${fields.length + 1}`);
+    values.push(provincia);
+  }
+  if (localidad !== undefined && localidad !== null) {
+    fields.push(`localidad = $${fields.length + 1}`);
+    values.push(localidad);
+  }
+  if (importe !== undefined && importe !== null) {
+    importe = parseFloat(importe.toFixed(2));
+    fields.push(`importe = $${fields.length + 1}`);
+    values.push(importe);
+  }
+  if (contacto !== undefined && contacto !== null) {
+    fields.push(`contacto = $${fields.length + 1}`);
+    values.push(contacto);
+  }
+  if (observaciones !== undefined && observaciones !== null) {
+    fields.push(`observaciones = $${fields.length + 1}`);
+    values.push(observaciones);
+  }
+
+  fields.push(`updated_at = $${fields.length + 1}`);
+  values.push(lastUpdated || new Date().toISOString());
+
+  // updatedBy no está en la tabla obras, si quieres guardar quién actualiza tendrás que añadir ese campo.
+
+  const query = `UPDATE obras SET ${fields.join(', ')} WHERE id = $${values.length + 1} RETURNING *`;
+  values.push(id);
+
+  const result = await client.query(query, values);
+  return parseObraRow(result.rows[0]);
+}
+
+export async function deleteObra(id: number): Promise<void> {
+  await connectClient();
+  await client.query('DELETE FROM obras WHERE id = $1', [id]);
 }
