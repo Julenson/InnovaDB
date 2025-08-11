@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { Obra } from "@/lib/types";
-import { useSession } from "next-auth/react";
+import { useUser } from "@/hooks/use-user";
 
 interface Props {
   obra: Obra;
@@ -32,8 +32,7 @@ export function EditObraDialog({ obra, onSave, onClose, open }: Props) {
     observaciones: obra.observaciones || '',
   });
 
-  const { data: session } = useSession();
-  const currentUser = session?.user;
+  const { user: currentUser, loading } = useUser();
 
   React.useEffect(() => {
     setForm({

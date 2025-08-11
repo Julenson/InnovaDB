@@ -34,28 +34,29 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import type { Obra, User } from '@/lib/types';
+import type { Obra } from '@/lib/types';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { EditObraDialog } from './edit-obra-dialog';
 import { es } from 'date-fns/locale';
+import { useUser } from '@/hooks/use-user';
 
 interface ObrasTableProps {
   obras: Obra[];
   onRemove: (id: number) => void;
   onUpdateObra: (obra: Obra) => Promise<void>;
-  currentUser: User | null;
-  currentUserRole: string;
 }
 
-export function ObrasTable({
-  obras,
-  onRemove,
-  onUpdateObra,
-  currentUser,
-  currentUserRole,
-}: ObrasTableProps) {
-  const role = currentUserRole?.trim().toLowerCase();
-  const canEdit = true; // O puedes condicionar por role
+export function ObrasTable({ obras, onRemove, onUpdateObra }: ObrasTableProps) {
+  const { user, loading } = useUser();
+
+  // Mientras carga usuario, opcionalmente muestra algo o nada
+  if (loading) {
+    return <div>Cargando usuario...</div>;
+  }
+
+  const role = user?.category?.trim().toLowerCase() ?? '';
+  // Controla permisos de edición según rol
+  const canEdit = role === 'developer' || role === 'owner';
 
   const [editingObra, setEditingObra] = React.useState<Obra | null>(null);
   const [deletingObraId, setDeletingObraId] = React.useState<number | null>(null);
