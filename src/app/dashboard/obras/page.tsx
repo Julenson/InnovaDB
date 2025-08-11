@@ -127,8 +127,6 @@ export default function ObrasPage() {
                 <TableHead>Importe</TableHead>
                 <TableHead>Contacto</TableHead>
                 <TableHead>Observaciones</TableHead>
-                <TableHead>Actualizado por</TableHead>
-                <TableHead>Última actualización</TableHead>
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
