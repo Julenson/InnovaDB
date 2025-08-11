@@ -1,8 +1,7 @@
-"use client";
+'use client';
 
 import * as React from "react";
-import { MoreHorizontal, Plus, Trash2, Edit2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { MoreHorizontal, Trash2, Edit2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -23,23 +22,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-export interface Obra {
-  id: number;
-  obra: string; 
-  email: string;
-  provincia: string;
-  localidad: string;
-  importe: number; 
-  contacto: string; 
-  observaciones: string;
-  updatedBy: string;
-  lastUpdated: string; 
-}
+import { Button } from "@/components/ui/button";
+import { AddObraDialog } from "@/components/add-obra-dialog"; 
+import type { Obra } from "@/lib/types";
+import Header from "@/components/header";
 
 export default function ObrasPage() {
   const [data, setData] = React.useState<Obra[]>([]);
   const [search, setSearch] = React.useState("");
+  const [openAddObra, setOpenAddObra] = React.useState(false);
 
   React.useEffect(() => {
     fetch("/api/obras")
@@ -48,7 +39,6 @@ export default function ObrasPage() {
       .catch((err) => console.error(err));
   }, []);
 
-  // Filtrar obras según búsqueda
   const filteredData = data.filter((obra) => {
     const lowerSearch = search.toLowerCase();
     return (
@@ -60,90 +50,140 @@ export default function ObrasPage() {
     );
   });
 
+  const handleAddObra = async (newObra: Omit<Obra, "id">) => {
+    try {
+      const res = await fetch("/api/obras", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newObra),
+      });
+      if (!res.ok) throw new Error("Error al guardar obra");
+      const json = await res.json();
+      setData((prev) => [...prev, json.obra]);
+      setOpenAddObra(false);
+    } catch (error) {
+      console.error(error);
+      alert("Error al agregar obra");
+    }
+  };
+
+  // Aquí puedes definir las funciones para editar y eliminar si quieres
+  const handleEdit = (obra: Obra) => {
+    alert(`Editar obra: ${obra.obra} (pendiente implementar)`);
+  };
+
+  const handleDelete = async (obraId: number) => {
+    if (!confirm("¿Estás seguro de que quieres eliminar esta obra?")) return;
+
+    try {
+      const res = await fetch(`/api/obras/${obraId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Error al eliminar obra");
+      setData((prev) => prev.filter((obra) => obra.id !== obraId));
+    } catch (error) {
+      console.error(error);
+      alert("Error al eliminar obra");
+    }
+  };
+
   return (
-    <Card>
-      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <CardDescription>Gestiona las obras desde aquí.</CardDescription>
-        <div className="flex gap-2 w-full sm:w-auto">
-          <input
-            type="text"
-            placeholder="Buscar obra, email, provincia..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="flex-grow rounded border border-input px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-0"
-            aria-label="Buscar obra"
-          />
-          <Button
-            className="whitespace-nowrap"
-            onClick={() => {
-              /* Acción para nueva obra */
-            }}
-          >
-            <Plus size={16} />
-            Nueva Obra
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Obra</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Provincia</TableHead>
-              <TableHead>Localidad</TableHead>
-              <TableHead>Importe</TableHead>
-              <TableHead>Contacto</TableHead>
-              <TableHead>Observaciones</TableHead>
-              <TableHead>Actualizado por</TableHead>
-              <TableHead>Última actualización</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredData.length === 0 ? (
+    <>
+      <Header />
+
+      <Card>
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <CardDescription>Gestiona las obras desde aquí.</CardDescription>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <input
+              type="text"
+              placeholder="Buscar obra, email, provincia..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="flex-grow rounded border border-input px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-0"
+              aria-label="Buscar obra"
+            />
+
+            <AddObraDialog
+              open={openAddObra}
+              onOpenChange={setOpenAddObra}
+              onAdd={handleAddObra}
+              trigger={
+                <Button className="whitespace-nowrap" variant="default">
+                  + Nueva Obra
+                </Button>
+              }
+            />
+          </div>
+        </CardHeader>
+
+        <CardContent>
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={11} className="text-center py-6 text-muted-foreground">
-                  No se encontraron obras que coincidan con la búsqueda.
-                </TableCell>
+                <TableHead>ID</TableHead>
+                <TableHead>Obra</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Provincia</TableHead>
+                <TableHead>Localidad</TableHead>
+                <TableHead>Importe</TableHead>
+                <TableHead>Contacto</TableHead>
+                <TableHead>Observaciones</TableHead>
+                <TableHead>Actualizado por</TableHead>
+                <TableHead>Última actualización</TableHead>
+                <TableHead className="w-[50px]"></TableHead>
               </TableRow>
-            ) : (
-              filteredData.map((obra) => (
-                <TableRow key={obra.id}>
-                  <TableCell>{obra.id}</TableCell>
-                  <TableCell>{obra.obra}</TableCell>
-                  <TableCell>{obra.email}</TableCell>
-                  <TableCell>{obra.provincia}</TableCell>
-                  <TableCell>{obra.localidad}</TableCell>
-                  <TableCell>{obra.importe}</TableCell>
-                  <TableCell>{obra.contacto}</TableCell>
-                  <TableCell>{obra.observaciones}</TableCell>
-                  <TableCell>{obra.updatedBy}</TableCell>
-                  <TableCell>{obra.lastUpdated}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal size={16} />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem className="flex items-center gap-2">
-                          <Edit2 size={14} /> Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="flex items-center gap-2 text-red-600">
-                          <Trash2 size={14} /> Eliminar
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+            </TableHeader>
+
+            <TableBody>
+              {filteredData.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={11}
+                    className="text-center py-6 text-muted-foreground"
+                  >
+                    No se encontraron obras que coincidan con la búsqueda.
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+              ) : (
+                filteredData.map((obra) => (
+                  <TableRow key={obra.id}>
+                    <TableCell>{obra.id}</TableCell>
+                    <TableCell>{obra.obra}</TableCell>
+                    <TableCell>{obra.email}</TableCell>
+                    <TableCell>{obra.provincia}</TableCell>
+                    <TableCell>{obra.localidad}</TableCell>
+                    <TableCell>{obra.importe}</TableCell>
+                    <TableCell>{obra.contacto}</TableCell>
+                    <TableCell>{obra.observaciones}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal size={16} />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            className="flex items-center gap-2"
+                            onClick={() => handleEdit(obra)}
+                          >
+                            <Edit2 size={14} /> Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="flex items-center gap-2 text-red-600"
+                            onClick={() => handleDelete(obra.id)}
+                          >
+                            <Trash2 size={14} /> Eliminar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </>
   );
 }
