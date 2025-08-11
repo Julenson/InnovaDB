@@ -144,6 +144,17 @@ export function AddMaterialDialog({ trigger, open, onOpenChange, onAdd }: AddMat
             )}
           </div>
 
+          <div>
+            <label htmlFor="lastDestiny" className="block text-sm font-medium leading-6 text-foreground">
+              Último Destino
+            </label>
+            <input
+              id="lastDestiny"
+              {...register('lastDestiny')}
+              className="mt-2 block w-full rounded-md border border-border bg-card px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
+            />
+          </div>
+
           <div className="flex justify-end space-x-4 pt-4">
             <button
               type="button"

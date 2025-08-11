@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
       lastUpdated,
       updatedBy,
       description,
+      lastDestiny,
     } = await request.json();
 
     if (!name || quantity === undefined || quantity < 0) {
@@ -48,7 +49,8 @@ export async function POST(request: NextRequest) {
       category || null,
       description || null,
       updatedBy || 'Desconocido',
-      lastUpdated
+      lastUpdated,
+      lastDestiny || null
     );
     return NextResponse.json(newMaterial, { status: 201 });
   } catch (error) {
@@ -69,6 +71,7 @@ export async function PUT(request: NextRequest) {
       description,
       updatedBy,
       lastUpdated,
+      lastDestiny,
     } = await request.json();
 
     if (!id || !updatedBy) {
@@ -102,6 +105,7 @@ export async function PUT(request: NextRequest) {
       description: description ?? null,
       updatedBy,
       lastUpdated,
+      lastDestiny: lastDestiny ?? null,
     });
 
     return NextResponse.json(updatedMaterial, { status: 200 });

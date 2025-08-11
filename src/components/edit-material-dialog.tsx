@@ -29,6 +29,7 @@ export function EditMaterialDialog({ material, onSave, onClose, open }: Props) {
     description: material.description || '',
     valor: material.valor ?? null,
     factura: material.factura || '',
+    lastDestiny: material.lastDestiny || '',
   });
 
   const { user: currentUser, loading } = useUser();
@@ -41,6 +42,7 @@ export function EditMaterialDialog({ material, onSave, onClose, open }: Props) {
       description: material.description || '',
       valor: material.valor ?? null,
       factura: material.factura || '',
+      lastDestiny: material.lastDestiny || '',
     });
   }, [material]);
 
@@ -110,6 +112,14 @@ export function EditMaterialDialog({ material, onSave, onClose, open }: Props) {
             <Input
               name="factura"
               value={form.factura}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <Label>Último Destino</Label>
+            <Input
+              name="lastDestiny"
+              value={form.lastDestiny}
               onChange={handleChange}
             />
           </div>

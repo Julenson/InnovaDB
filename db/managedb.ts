@@ -1,6 +1,6 @@
 // db/managedb.ts
 import client, { connectClient } from '@lib/db';
-import type { Material, User, Obra} from '@lib/types';
+import type { Material, User, Obra } from '@lib/types';
 
 export async function getPostById(postId: number) {
   await connectClient();
@@ -21,7 +21,8 @@ export async function initDatabase() {
       category VARCHAR(255),
       description VARCHAR(255),
       updatedBy VARCHAR(255),
-      lastUpdated TIMESTAMP DEFAULT NOW()
+      lastUpdated TIMESTAMP DEFAULT NOW(),
+      lastDestiny VARCHAR(255) NULL  -- nueva columna añadida aquí
     );
   `);
 
@@ -40,7 +41,7 @@ export async function initDatabase() {
     ON CONFLICT (email) DO NOTHING
   `);
 
-    await client.query(`
+  await client.query(`
     CREATE TABLE IF NOT EXISTS obras (
       id INT AUTO_INCREMENT PRIMARY KEY,
       obra VARCHAR(255) NOT NULL,
@@ -62,19 +63,20 @@ function parseMaterialRow(row: any): Material {
     quantity: parseFloat(row.quantity),
     valor: parseFloat(row.valor),
     factura: row.factura || null,
+    lastDestiny: row.lastdestiny || row.lastDestiny || null,
   };
 }
 
 export async function getAllMaterials(): Promise<Material[]> {
   await connectClient();
-  const result = await client.query('SELECT id, name, quantity, valor, factura, category, description, updatedBy, lastUpdated FROM materials');
+  const result = await client.query('SELECT id, name, quantity, valor, factura, category, description, updatedBy, lastUpdated, lastDestiny FROM materials');
   return result.rows.map(parseMaterialRow) as Material[];
 }
 
 export async function getMaterialById(id: number): Promise<Material | undefined> {
   await connectClient();
   const result = await client.query(
-    'SELECT id, name, quantity, valor, factura, category, description, updatedBy, lastUpdated FROM materials WHERE id = $1',
+    'SELECT id, name, quantity, valor, factura, category, description, updatedBy, lastUpdated, lastDestiny FROM materials WHERE id = $1',
     [id]
   );
   if (result.rows.length === 0) return undefined;
@@ -89,7 +91,8 @@ export async function addMaterial(
   category: string | null,
   description: string | null,
   updatedBy: string,
-  lastUpdated?: string
+  lastUpdated?: string,
+  lastDestiny?: string | null
 ): Promise<Material> {
   await connectClient();
 
@@ -97,10 +100,10 @@ export async function addMaterial(
   valor = parseFloat(valor.toFixed(2));
 
   const result = await client.query(
-    `INSERT INTO materials (name, quantity, valor, factura, category, description, updatedBy, lastUpdated)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-     RETURNING id, name, quantity, valor, factura, category, description, updatedBy, lastUpdated`,
-    [name, quantity, valor, factura, category, description, updatedBy, lastUpdated || new Date().toISOString()]
+    `INSERT INTO materials (name, quantity, valor, factura, category, description, updatedBy, lastUpdated, lastDestiny)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+     RETURNING id, name, quantity, valor, factura, category, description, updatedBy, lastUpdated, lastDestiny`,
+    [name, quantity, valor, factura, category, description, updatedBy, lastUpdated || new Date().toISOString(), lastDestiny || null]
   );
 
   return parseMaterialRow(result.rows[0]);
@@ -121,7 +124,7 @@ export async function updateMaterialQuantityAndValor(
     `UPDATE materials 
      SET quantity = $1, valor = $2, updatedBy = $3, lastUpdated = NOW()
      WHERE id = $4
-     RETURNING id, name, quantity, valor, factura, category, description, updatedBy, lastUpdated`,
+     RETURNING id, name, quantity, valor, factura, category, description, updatedBy, lastUpdated, lastDestiny`,
     [quantity, valor, updatedBy, id]
   );
   return parseMaterialRow(result.rows[0]);
@@ -155,6 +158,7 @@ type UpdateMaterialArgs = {
   description?: string | null;
   updatedBy: string;
   lastUpdated?: string;
+  lastDestiny?: string | null;
 };
 
 export async function updateMaterial({
@@ -167,6 +171,7 @@ export async function updateMaterial({
   description,
   updatedBy,
   lastUpdated,
+  lastDestiny,
 }: UpdateMaterialArgs): Promise<Material> {
   await connectClient();
   const fields = [];
@@ -197,6 +202,10 @@ export async function updateMaterial({
   if (description !== undefined && description !== null) {
     fields.push(`description = $${fields.length + 1}`);
     values.push(description);
+  }
+  if (lastDestiny !== undefined && lastDestiny !== null) {
+    fields.push(`lastDestiny = $${fields.length + 1}`);
+    values.push(lastDestiny);
   }
 
   fields.push(`updatedBy = $${fields.length + 1}`);
