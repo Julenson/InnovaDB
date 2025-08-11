@@ -43,9 +43,11 @@ export default function SelectTablePage() {
         </Button>
 
         {/* Añadido botón para obras */}
-        <Button className="w-48" onClick={() => router.push('/dashboard/obras')}>
-          Obras
-        </Button>
+        {(role === 'owner' || role == 'developer') && (
+          <Button className="w-48" onClick={() => router.push('/dashboard/obras')}>
+            Obras
+          </Button>
+        )}
       </div>
     </div>
   );
