@@ -150,6 +150,7 @@ export default function DashboardPage() {
   }
 
   async function handleUpdateMaterial(material: Material): Promise<void> {
+    console.log('Usuario al actualizar: ', currentUser);
     const token = localStorage.getItem('token');
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
