@@ -24,11 +24,17 @@ export default function DashboardPage() {
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
       try {
-        const userRes = await fetch('/api/users', { headers });
+        const userRes = await fetch('/api/users/current', { headers });
         if (userRes.ok) {
           const userData = await userRes.json();
-          setCurrentUser(userData);
-          setCurrentUserRole((userData.category || '').toLowerCase());
+          if (!userData.error) {
+            setCurrentUser(userData);
+            setCurrentUserRole((userData.category || '').toLowerCase());
+          } else {
+            console.error('Error en usuario actual:', userData.error);
+          }
+        } else {
+          console.error('No autorizado o error al obtener usuario actual');
         }
 
         const matRes = await fetch('/api/materials', { headers, cache: 'no-store' });
