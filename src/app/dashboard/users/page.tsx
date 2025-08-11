@@ -225,13 +225,10 @@ export default function UsersDashboardPage() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Gestión de Usuarios</h1>
           {isAuthorized && (
-            <button
-              className="btn-primary"
-              onClick={() => setIsAddDialogOpen(true)}
-              aria-label="Agregar usuario"
-            >
+            <Button variant="default" onClick={() => setIsAddDialogOpen(true)} aria-label="Agregar usuario">
               + Agregar usuario
-            </button>
+            </Button>
+
           )}
         </div>
 

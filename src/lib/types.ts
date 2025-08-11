@@ -5,6 +5,7 @@ export interface Material {
   category: string | null;
   valor: number | null;
   factura: string | null; 
+  lastDestiny?: string | null;
   lastUpdated?: string | null; 
   updatedBy?: string | null;
   description: string | null;
@@ -29,4 +30,3 @@ export interface Obra {
   created_at: string;
   updated_at: string; 
 }
-

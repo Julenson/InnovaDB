@@ -45,6 +45,7 @@ export default function DashboardPage() {
                 ...m,
                 updatedBy: m.updatedby ?? m.updatedBy ?? null,
                 lastUpdated: m.lastupdated ?? m.lastUpdated ?? null,
+                lastDestiny: m.lastdestiny ?? m.lastDestiny ?? null,
               }))
             : [];
 
@@ -68,6 +69,7 @@ export default function DashboardPage() {
         material.category?.toLowerCase().includes(term) ||
         material.description?.toLowerCase().includes(term) ||
         material.updatedBy?.toLowerCase().includes(term) ||
+        material.lastDestiny?.toLowerCase().includes(term) ||
         material.quantity.toString().includes(term) ||
         (material.valor !== undefined && material.valor !== null && material.valor.toString().includes(term)) ||
         (material.factura ?? '').toLowerCase().includes(term)
@@ -113,6 +115,7 @@ export default function DashboardPage() {
       lastUpdated: new Date().toISOString(),
       valor: material.valor,
       factura: material.factura,
+      lastDestiny: material.lastDestiny ?? null,
     };
 
     const token = localStorage.getItem('token');
@@ -138,6 +141,7 @@ export default function DashboardPage() {
                   lastUpdated: updated.lastUpdated,
                   valor: updated.valor,
                   factura: updated.factura,
+                  lastDestiny: updated.lastDestiny ?? m.lastDestiny,
                 }
               : m
           )
@@ -170,6 +174,7 @@ export default function DashboardPage() {
       factura: material.factura,
       updatedBy: currentUser?.email || 'Desconocido',
       lastUpdated: new Date().toISOString(),
+      lastDestiny: material.lastDestiny ?? null,
     };
 
     try {
@@ -256,6 +261,7 @@ export default function DashboardPage() {
           lastUpdated: new Date().toISOString(),
           valor: pendingAddMaterial.valor ?? duplicate.valor,
           factura: pendingAddMaterial.factura ?? duplicate.factura,
+          lastDestiny: pendingAddMaterial.lastDestiny ?? duplicate.lastDestiny,
         });
         setIsAddDialogOpen(false);
       }

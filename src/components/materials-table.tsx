@@ -105,6 +105,7 @@ export function MaterialsTable({
                 <TableHead>Descripción</TableHead>
                 <TableHead>Valor</TableHead>
                 <TableHead>Factura</TableHead>
+                <TableHead>Último Destino</TableHead>
                 <TableHead>Última Actualización</TableHead>
                 <TableHead>Actualizado Por</TableHead>
                 <TableHead className="w-[60px] text-center"><span className="sr-only">Acciones</span></TableHead>
@@ -156,6 +157,7 @@ export function MaterialsTable({
                   <TableCell>{material.description}</TableCell>
                   <TableCell>{material.valor !== null ? `${material.valor} €` : '—'}</TableCell>
                   <TableCell>{material.factura ?? '—'}</TableCell>
+                  <TableCell>{material.lastDestiny ?? '—'}</TableCell>
                   <TableCell className="text-right">
                     {material.lastUpdated && typeof material.lastUpdated === 'string' && !isNaN(Date.parse(material.lastUpdated))
                       ? formatDistanceToNow(parseISO(material.lastUpdated), { addSuffix: true, locale: es })
