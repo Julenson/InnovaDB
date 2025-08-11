@@ -16,3 +16,17 @@ export interface User {
   password: string;
   category: string | null;
 }
+
+export interface Obra {
+  id: number;
+  obra: string; 
+  email: string;
+  provincia: string;
+  localidad: string;
+  importe: number; 
+  contacto: string; 
+  observaciones: string;
+  created_at: string;
+  updated_at: string; 
+}
+

@@ -39,6 +39,21 @@ export async function initDatabase() {
     VALUES ('demo@innovasport.com', 'demopassword')
     ON CONFLICT (email) DO NOTHING
   `);
+
+    await client.query(`
+    CREATE TABLE IF NOT EXISTS obras (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      obra VARCHAR(255) NOT NULL,
+      email VARCHAR(255) NOT NULL,
+      provincia VARCHAR(100) DEFAULT NULL,
+      localidad VARCHAR(100) DEFAULT NULL,
+      importe DECIMAL(10,2) NOT NULL,
+      contacto VARCHAR(255) DEFAULT NULL,
+      observaciones TEXT DEFAULT NULL,
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    );
+  `);
 }
 
 function parseMaterialRow(row: any): Material {
