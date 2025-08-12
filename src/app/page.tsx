@@ -20,61 +20,54 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError(null);
+    e.preventDefault();
+    setError(null);
 
-  const form = e.currentTarget as HTMLFormElement;
-  const formData = new FormData(form);
-  const email = (formData.get('email') as string).toLowerCase();
-  const password = formData.get('password') as string;
+    const form = e.currentTarget as HTMLFormElement;
+    const formData = new FormData(form);
+    const email = (formData.get('email') as string).toLowerCase();
+    const password = formData.get('password') as string;
 
-  try {
-    const res = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (!res.ok) {
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || 'Error desconocido');
+        return;
+      }
+
       const data = await res.json();
-      setError(data.error || 'Error desconocido');
-      return;
+      const token = data.token;
+      localStorage.setItem('token', token);
+
+      // Decodificamos el JWT para ver la categoría del usuario
+      const [, payloadBase64] = token.split('.');
+      const payload = JSON.parse(atob(payloadBase64));
+      const role = (payload.category || '').trim().toLowerCase();
+
+      // Solo permitimos acceso si es developer u owner
+      if (['developer', 'owner'].includes(role)) {
+        router.push('/select-table');
+      } else {
+        router.push('/dashboard/materials');
+      }
+    } catch {
+      setError('Error en la conexión');
     }
-
-    const data = await res.json();
-    const token = data.token;
-    localStorage.setItem('token', token);
-
-    // Decodificamos el JWT para ver la categoría del usuario
-    const [, payloadBase64] = token.split('.');
-    const payload = JSON.parse(atob(payloadBase64));
-    const role = (payload.category || '').trim().toLowerCase();
-
-    // Solo permitimos acceso si es developer u owner
-    if (['developer', 'owner'].includes(role)) {
-      router.push('/select-table');
-    } else {
-      router.push('/dashboard/materials');
-    }
-  } catch {
-    setError('Error en la conexión');
-  }
-};
-
+  };
 
   return (
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
-      <div className="hidden bg-primary lg:flex lg:flex-col lg:items-center lg:justify-center lg:p-10">
-        <div className="flex items-center text-primary-foreground">
-          <div className="w-48">
-            <Logo className="w-full h-auto" aria-label="Logo Innova-Sport" />
-          </div>
+      <div className="hidden bg-primary lg:flex lg:flex-col lg:items-start lg:justify-center lg:p-10">
+        <div className="w-64 h-64">
+          <Logo className="w-full h-auto" aria-label="Logo Innova-Sport" />
         </div>
-        <div className="mt-6 text-center">
-          <p className="mt-2 text-lg text-primary-foreground/80">
-            Manejo de Inventario
-          </p>
-        </div>
+        {/* Eliminado el texto "Manejo de Inventario" */}
         <p className="mt-auto text-sm text-primary-foreground/60">
           &copy; 2024 Innova-Sport. All Rights Reserved.
         </p>
