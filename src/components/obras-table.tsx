@@ -1,7 +1,9 @@
+// File: components/obras-table.tsx
 'use client';
 
 import * as React from 'react';
 import { MoreHorizontal, Trash2, Edit2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -44,15 +46,15 @@ interface ObrasTableProps {
   obras: Obra[];
   onRemove: (id: number) => void;
   onUpdateObra: (obra: Obra) => Promise<void>;
+  filter?: string;
 }
 
-export function ObrasTable({ obras, onRemove, onUpdateObra }: ObrasTableProps) {
+export function ObrasTable({ obras, onRemove, onUpdateObra, filter = '' }: ObrasTableProps) {
   const { user, loading } = useUser();
 
   const [editingObra, setEditingObra] = React.useState<Obra | null>(null);
   const [deletingObraId, setDeletingObraId] = React.useState<number | null>(null);
   const [menuOpenFor, setMenuOpenFor] = React.useState<number | null>(null);
-  const [filter, setFilter] = React.useState<string>('');
 
   if (loading) {
     return <div>Cargando usuario...</div>;
@@ -61,34 +63,36 @@ export function ObrasTable({ obras, onRemove, onUpdateObra }: ObrasTableProps) {
   const role = user?.category?.trim().toLowerCase() ?? '';
   const canEdit = role === 'developer' || role === 'owner';
 
-  const filteredObras = obras.filter(
-    (obra) =>
-      obra.obra.toLowerCase().includes(filter.toLowerCase()) ||
-      obra.provincia.toLowerCase().includes(filter.toLowerCase())
-  );
+  const term = (filter || '').trim().toLowerCase();
+
+  const filteredObras = obras.filter((obra) => {
+    if (!term) return true;
+    return (
+      (obra.obra || '').toLowerCase().includes(term) ||
+      (obra.provincia || '').toLowerCase().includes(term) ||
+      (obra.localidad || '').toLowerCase().includes(term) ||
+      (obra.email || '').toLowerCase().includes(term) ||
+      (obra.contacto || '').toLowerCase().includes(term) ||
+      (obra.observaciones || '').toLowerCase().includes(term) ||
+      (obra.importe !== null && obra.importe !== undefined && obra.importe.toString().includes(term))
+    );
+  });
 
   return (
     <>
       <Card>
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <h2 className="text-lg font-semibold">Gestión de Obras</h2>
-          <input
-            type="text"
-            placeholder="Buscar obra o provincia..."
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="max-w-xs w-full sm:max-w-sm px-3 py-2 rounded border border-gray-300 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            aria-label="Buscar obra o provincia"
-          />
+        <CardHeader>
+          <CardDescription>Gestiona las obras desde aquí.</CardDescription>
         </CardHeader>
-        <CardDescription className="px-4 pb-2">
-          Gestiona las obras desde aquí.
-        </CardDescription>
-        <CardContent className="p-0">
-          <div className="max-h-[400px] overflow-auto">
+
+        <CardContent>
+          <div className="relative max-h-[400px] overflow-auto">
             <Table className="min-w-full border-collapse">
-              <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
+              <TableHeader className="sticky top-0 bg-white z-20 shadow-sm">
                 <TableRow>
+                  <TableHead className="hidden w-[100px] sm:table-cell">
+                    <span className="sr-only">Imagen</span>
+                  </TableHead>
                   <TableHead>Obra</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Provincia</TableHead>
@@ -96,22 +100,32 @@ export function ObrasTable({ obras, onRemove, onUpdateObra }: ObrasTableProps) {
                   <TableHead>Importe</TableHead>
                   <TableHead>Contacto</TableHead>
                   <TableHead>Observaciones</TableHead>
+                  <TableHead>Creada</TableHead>
                   <TableHead>Última Actualización</TableHead>
                   <TableHead className="w-[60px] text-center">
                     <span className="sr-only">Acciones</span>
                   </TableHead>
                 </TableRow>
               </TableHeader>
+
               <TableBody>
                 {filteredObras.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-6 text-muted-foreground">
+                    <TableCell colSpan={11} className="text-center py-6 text-muted-foreground">
                       No se encontraron obras que coincidan con la búsqueda.
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredObras.map((obra) => (
                     <TableRow key={obra.id}>
+                      <TableCell className="hidden sm:table-cell">
+                        <div className="w-16 h-16 bg-muted rounded-md flex items-center justify-center">
+                          <span className="text-2xl font-bold text-muted-foreground">
+                            {obra.obra?.charAt(0) ?? '?'}
+                          </span>
+                        </div>
+                      </TableCell>
+
                       <TableCell className="font-medium">{obra.obra}</TableCell>
                       <TableCell>{obra.email}</TableCell>
                       <TableCell>{obra.provincia}</TableCell>
@@ -121,16 +135,21 @@ export function ObrasTable({ obras, onRemove, onUpdateObra }: ObrasTableProps) {
                           ? `${obra.importe.toFixed(2)} €`
                           : '—'}
                       </TableCell>
-                      <TableCell>{obra.contacto || '—'}</TableCell>
-                      <TableCell>{obra.observaciones || '—'}</TableCell>
+                      <TableCell>{obra.contacto ?? '—'}</TableCell>
+                      <TableCell>{obra.observaciones ?? '—'}</TableCell>
+
                       <TableCell className="text-right">
-                        {obra.updated_at && !isNaN(Date.parse(obra.updated_at))
-                          ? formatDistanceToNow(parseISO(obra.updated_at), {
-                              addSuffix: true,
-                              locale: es,
-                            })
+                        {obra.created_at && !isNaN(Date.parse(obra.created_at))
+                          ? formatDistanceToNow(parseISO(obra.created_at), { addSuffix: true, locale: es })
                           : '—'}
                       </TableCell>
+
+                      <TableCell className="text-right">
+                        {obra.updated_at && !isNaN(Date.parse(obra.updated_at))
+                          ? formatDistanceToNow(parseISO(obra.updated_at), { addSuffix: true, locale: es })
+                          : '—'}
+                      </TableCell>
+
                       <TableCell className="text-center">
                         {canEdit && (
                           <DropdownMenu
@@ -153,11 +172,8 @@ export function ObrasTable({ obras, onRemove, onUpdateObra }: ObrasTableProps) {
                                 <MoreHorizontal className="h-5 w-5 text-red-700" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                              align="end"
-                              sideOffset={5}
-                              className="bg-white border rounded shadow-md z-[1000]"
-                            >
+
+                            <DropdownMenuContent align="end" sideOffset={5} className="bg-white border rounded shadow-md z-[1000]">
                               <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                               <DropdownMenuItem
                                 onClick={() => {
@@ -169,6 +185,7 @@ export function ObrasTable({ obras, onRemove, onUpdateObra }: ObrasTableProps) {
                                 <Edit2 className="h-4 w-4" />
                                 Editar
                               </DropdownMenuItem>
+
                               <DropdownMenuItem
                                 onClick={() => {
                                   setDeletingObraId(obra.id);
@@ -188,6 +205,14 @@ export function ObrasTable({ obras, onRemove, onUpdateObra }: ObrasTableProps) {
                 )}
               </TableBody>
             </Table>
+
+            {/* Sticky horizontal scrollbar container */}
+            <div
+              className="absolute bottom-0 left-0 right-0 overflow-x-auto overflow-y-hidden"
+              style={{ height: '1.5rem' }}
+            >
+              <div style={{ width: 'max-content', minWidth: '100%' }} />
+            </div>
           </div>
         </CardContent>
       </Card>
