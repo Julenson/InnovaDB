@@ -77,7 +77,7 @@ export default function ObrasPage() {
   }
 
   return (
-    <main className="p-4 max-w-7xl mx-auto flex flex-col gap-4">
+    <main className="p-4 flex flex-col gap-4 w-full">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Gestión de Obras</h1>
         <AddObraDialog

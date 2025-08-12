@@ -78,7 +78,7 @@ export function ObrasTable({ obras, onRemove, onUpdateObra, filter = '' }: Obras
 
   return (
     <>
-      <div className="w-full px-4 sm:px-6 lg:px-8">
+      <div className="w-full">
         <Card className="w-full">
           <CardHeader>
             <CardDescription>Gestiona las obras desde aquí.</CardDescription>
