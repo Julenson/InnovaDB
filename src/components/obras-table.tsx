@@ -96,7 +96,7 @@ export function ObrasTable({ obras, onRemove, onUpdateObra, filter = '' }: Obras
                       <span className="sr-only">Imagen</span>
                     </TableHead>
                     <TableHead className="px-10">Obra</TableHead>
-                    <TableHead className="px-10">Email</TableHead>
+                    <TableHead className="px-10">Comercial</TableHead>
                     <TableHead className="px-10">Provincia</TableHead>
                     <TableHead className="px-10">Localidad</TableHead>
                     <TableHead className="px-10">Importe</TableHead>
