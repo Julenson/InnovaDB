@@ -78,15 +78,15 @@ export function ObrasTable({ obras, onRemove, onUpdateObra, filter = '' }: Obras
 
   return (
     <>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Card>
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <Card className="w-full">
           <CardHeader>
             <CardDescription>Gestiona las obras desde aquí.</CardDescription>
           </CardHeader>
 
-          <CardContent>
-            <div className="relative max-h-[400px] overflow-auto">
-              <Table className="min-w-full border-collapse">
+          <CardContent className="w-full">
+            <div className="relative max-h-[400px] overflow-auto w-full">
+              <Table className="w-full border-collapse">
                 <TableHeader className="sticky top-0 bg-white z-20 shadow-sm">
                   <TableRow>
                     <TableHead className="hidden w-[100px] sm:table-cell px-10">
