@@ -89,19 +89,19 @@ export function ObrasTable({ obras, onRemove, onUpdateObra, filter = '' }: Obras
               <Table className="min-w-full border-collapse">
                 <TableHeader className="sticky top-0 bg-white z-20 shadow-sm">
                   <TableRow>
-                    <TableHead className="hidden w-[100px] sm:table-cell px-6">
+                    <TableHead className="hidden w-[100px] sm:table-cell px-10">
                       <span className="sr-only">Imagen</span>
                     </TableHead>
-                    <TableHead className="px-6">Obra</TableHead>
-                    <TableHead className="px-6">Email</TableHead>
-                    <TableHead className="px-6">Provincia</TableHead>
-                    <TableHead className="px-6">Localidad</TableHead>
-                    <TableHead className="px-6">Importe</TableHead>
-                    <TableHead className="px-6">Contacto</TableHead>
-                    <TableHead className="px-6">Observaciones</TableHead>
-                    <TableHead className="px-6">Creada</TableHead>
-                    <TableHead className="px-6">Última Actualización</TableHead>
-                    <TableHead className="w-[60px] text-center px-6">
+                    <TableHead className="px-10">Obra</TableHead>
+                    <TableHead className="px-10">Email</TableHead>
+                    <TableHead className="px-10">Provincia</TableHead>
+                    <TableHead className="px-10">Localidad</TableHead>
+                    <TableHead className="px-10">Importe</TableHead>
+                    <TableHead className="px-10">Contacto</TableHead>
+                    <TableHead className="px-10">Observaciones</TableHead>
+                    <TableHead className="px-10">Creada</TableHead>
+                    <TableHead className="px-10">Última Actualización</TableHead>
+                    <TableHead className="w-[60px] text-center px-10">
                       <span className="sr-only">Acciones</span>
                     </TableHead>
                   </TableRow>
@@ -110,14 +110,14 @@ export function ObrasTable({ obras, onRemove, onUpdateObra, filter = '' }: Obras
                 <TableBody>
                   {filteredObras.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={11} className="text-center py-6 text-muted-foreground px-6">
+                      <TableCell colSpan={11} className="text-center py-6 text-muted-foreground px-10">
                         No se encontraron obras que coincidan con la búsqueda.
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredObras.map((obra) => (
                       <TableRow key={obra.id}>
-                        <TableCell className="hidden sm:table-cell px-6">
+                        <TableCell className="hidden sm:table-cell px-10">
                           <div className="w-16 h-16 bg-muted rounded-md flex items-center justify-center">
                             <span className="text-2xl font-bold text-muted-foreground">
                               {obra.obra?.charAt(0) ?? '?'}
@@ -125,31 +125,31 @@ export function ObrasTable({ obras, onRemove, onUpdateObra, filter = '' }: Obras
                           </div>
                         </TableCell>
 
-                        <TableCell className="font-medium px-6">{obra.obra}</TableCell>
-                        <TableCell className="px-6">{obra.email}</TableCell>
-                        <TableCell className="px-6">{obra.provincia}</TableCell>
-                        <TableCell className="px-6">{obra.localidad}</TableCell>
-                        <TableCell className="px-6">
+                        <TableCell className="font-medium px-10">{obra.obra}</TableCell>
+                        <TableCell className="px-10">{obra.email}</TableCell>
+                        <TableCell className="px-10">{obra.provincia}</TableCell>
+                        <TableCell className="px-10">{obra.localidad}</TableCell>
+                        <TableCell className="px-10">
                           {obra.importe !== null && obra.importe !== undefined
                             ? `${obra.importe.toFixed(2)} €`
                             : '—'}
                         </TableCell>
-                        <TableCell className="px-6">{obra.contacto ?? '—'}</TableCell>
-                        <TableCell className="px-6">{obra.observaciones ?? '—'}</TableCell>
+                        <TableCell className="px-10">{obra.contacto ?? '—'}</TableCell>
+                        <TableCell className="px-10">{obra.observaciones ?? '—'}</TableCell>
 
-                        <TableCell className="text-right px-6">
+                        <TableCell className="text-right px-10">
                           {obra.created_at && !isNaN(Date.parse(obra.created_at))
                             ? formatDistanceToNow(parseISO(obra.created_at), { addSuffix: true, locale: es })
                             : '—'}
                         </TableCell>
 
-                        <TableCell className="text-right px-6">
+                        <TableCell className="text-right px-10">
                           {obra.updated_at && !isNaN(Date.parse(obra.updated_at))
                             ? formatDistanceToNow(parseISO(obra.updated_at), { addSuffix: true, locale: es })
                             : '—'}
                         </TableCell>
 
-                        <TableCell className="text-center px-6">
+                        <TableCell className="text-center px-10">
                           {canEdit && (
                             <DropdownMenu
                               open={menuOpenFor === obra.id}
