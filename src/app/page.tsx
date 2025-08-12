@@ -63,14 +63,11 @@ export default function LoginPage() {
 
   return (
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
-      <div className="hidden bg-primary lg:flex lg:flex-col lg:items-start lg:justify-center lg:p-10">
-        <div className="w-64 h-64">
+      <div className="hidden bg-primary lg:flex lg:flex-col lg:items-center lg:justify-center lg:p-10">
+        <div className="w-96">
           <Logo className="w-full h-auto" aria-label="Logo Innova-Sport" />
         </div>
-        {/* Eliminado el texto "Manejo de Inventario" */}
-        <p className="mt-auto text-sm text-primary-foreground/60">
-          &copy; 2024 Innova-Sport. All Rights Reserved.
-        </p>
+        {/* Texto eliminado */}
       </div>
 
       <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
