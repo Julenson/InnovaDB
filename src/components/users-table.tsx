@@ -36,9 +36,9 @@ export function UsersTable({
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full table-auto border border-gray-300">
-        <thead className="bg-gray-100">
+    <div className="overflow-x-auto max-h-[400px]">
+      <table className="w-full table-auto border border-gray-300 border-collapse">
+        <thead className="bg-gray-100 sticky top-0 z-20">
           <tr>
             <th className="px-4 py-2 border">ID</th>
             <th className="px-4 py-2 border">Email</th>
@@ -79,7 +79,7 @@ export function UsersTable({
                   </button>
                   <button
                     className="text-red-600 hover:underline cursor-pointer"
-                    onClick={() => onDelete(user)} // Abrir diálogo interno
+                    onClick={() => onDelete(user)}
                     aria-label={`Eliminar usuario ${user.email}`}
                   >
                     Eliminar
