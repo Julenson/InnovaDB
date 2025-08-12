@@ -84,9 +84,12 @@ export function ObrasTable({ obras, onRemove, onUpdateObra, filter = '' }: Obras
             <CardDescription>Gestiona las obras desde aquí.</CardDescription>
           </CardHeader>
 
-          <CardContent className="w-full">
-            <div className="relative max-h-[400px] overflow-auto w-full">
-              <Table className="w-full border-collapse">
+          <CardContent className="w-full p-0">
+            <div
+              className="overflow-x-auto w-full"
+              style={{ maxHeight: '400px' }}
+            >
+              <Table className="min-w-[1200px] border-collapse w-full">
                 <TableHeader className="sticky top-0 bg-white z-20 shadow-sm">
                   <TableRow>
                     <TableHead className="hidden w-[100px] sm:table-cell px-10">
@@ -204,13 +207,6 @@ export function ObrasTable({ obras, onRemove, onUpdateObra, filter = '' }: Obras
                   )}
                 </TableBody>
               </Table>
-
-              <div
-                className="absolute bottom-0 left-0 right-0 overflow-x-auto overflow-y-hidden"
-                style={{ height: '1.5rem' }}
-              >
-                <div style={{ width: 'max-content', minWidth: '100%' }} />
-              </div>
             </div>
           </CardContent>
         </Card>
