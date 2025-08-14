@@ -68,7 +68,7 @@ export function ObrasTable({
           <CardDescription>Gestiona las obras desde aquí.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="relative h-[calc(100vh-150px)] overflow-auto pb-2">
+          <div className="relative h-[calc(100vh-10px)] overflow-auto pb-2">
             <Table className="min-w-full border-collapse">
               <TableHeader className="sticky top-0 bg-background z-20 shadow-sm">
                 <TableRow>
@@ -167,7 +167,6 @@ export function ObrasTable({
         </CardContent>
       </Card>
 
-      {/* Diálogo de edición */}
       {editingObra && (
         <EditObraDialog
           obra={editingObra}

@@ -93,8 +93,7 @@ export function MaterialsTable({
           <CardDescription>Gestiona el inventario con facilidad desde aquí.</CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Altura adaptativa: ocupa la ventana menos el espacio del header y padding */}
-          <div className="relative h-[calc(100vh-200px)] overflow-auto pb-1">
+          <div className="relative h-[calc(100vh-10px)] overflow-auto">
             <Table className="min-w-full border-collapse">
               <TableHeader className="sticky top-0 bg-background z-20 shadow-sm">
                 <TableRow>
