@@ -1,21 +1,21 @@
-'use client';
+'use client'
 
-import * as React from 'react';
-import { MoreHorizontal, Trash2, Edit2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import * as React from 'react'
+import { MoreHorizontal, Trash2, Edit2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-} from '@/components/ui/card';
+} from '@/components/ui/card'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu'
 import {
   Table,
   TableBody,
@@ -23,7 +23,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/ui/table'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,18 +33,18 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import type { Obra, User } from '@/lib/types';
-import { formatDistanceToNow, parseISO } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { EditObraDialog } from './edit-obra-dialog';
+} from '@/components/ui/alert-dialog'
+import type { Obra, User } from '@/lib/types'
+import { formatDistanceToNow, parseISO } from 'date-fns'
+import { es } from 'date-fns/locale'
+import { EditObraDialog } from './edit-obra-dialog'
 
 interface ObrasTableProps {
-  obras: Obra[];
-  onRemove: (id: number) => void;
-  onUpdateObra: (obra: Obra) => Promise<void>;
-  currentUser: User | null;
-  currentUserRole: string;
+  obras: Obra[]
+  onRemove: (id: number) => void
+  onUpdateObra: (obra: Obra) => Promise<void>
+  currentUser: User | null
+  currentUserRole: string
 }
 
 export function ObrasTable({
@@ -54,12 +54,12 @@ export function ObrasTable({
   currentUser,
   currentUserRole,
 }: ObrasTableProps) {
-  const role = currentUserRole?.trim().toLowerCase();
-  const canEdit = true;
+  const role = currentUserRole?.trim().toLowerCase()
+  const canEdit = true
 
-  const [editingObra, setEditingObra] = React.useState<Obra | null>(null);
-  const [deletingObraId, setDeletingObraId] = React.useState<number | null>(null);
-  const [menuOpenFor, setMenuOpenFor] = React.useState<number | null>(null);
+  const [editingObra, setEditingObra] = React.useState<Obra | null>(null)
+  const [deletingObraId, setDeletingObraId] = React.useState<number | null>(null)
+  const [menuOpenFor, setMenuOpenFor] = React.useState<number | null>(null)
 
   return (
     <>
@@ -68,12 +68,12 @@ export function ObrasTable({
           <CardDescription>Gestiona las obras desde aquí.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="relative max-h-[400px] overflow-auto">
+          <div className="relative h-[calc(100vh-150px)] overflow-auto pb-2">
             <Table className="min-w-full border-collapse">
               <TableHeader className="sticky top-0 bg-background z-20 shadow-sm">
                 <TableRow>
                   <TableHead>Obra</TableHead>
-                  <TableHead>Email</TableHead>
+                  <TableHead>Comercial</TableHead>
                   <TableHead>Provincia</TableHead>
                   <TableHead>Localidad</TableHead>
                   <TableHead>Importe</TableHead>
@@ -112,20 +112,21 @@ export function ObrasTable({
                           open={menuOpenFor === obra.id}
                           onOpenChange={(open) => {
                             if (open) {
-                              setMenuOpenFor(obra.id);
-                              setDeletingObraId(null);
+                              setMenuOpenFor(obra.id)
+                              setDeletingObraId(null)
                             } else {
-                              setMenuOpenFor(null);
+                              setMenuOpenFor(null)
                             }
                           }}
                         >
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
-                              className="h-8 w-8 p-0 bg-transparent border border-destructive"
+                              size="icon"
+                              className="text-primary hover:bg-primary/10"
                               aria-label={`Abrir menú de acciones para ${obra.obra}`}
                             >
-                              <MoreHorizontal className="h-5 w-5 text-destructive" />
+                              <MoreHorizontal className="h-5 w-5" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent
@@ -136,8 +137,8 @@ export function ObrasTable({
                             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                             <DropdownMenuItem
                               onClick={() => {
-                                setEditingObra(obra);
-                                setMenuOpenFor(null);
+                                setEditingObra(obra)
+                                setMenuOpenFor(null)
                               }}
                               className="flex items-center gap-2"
                             >
@@ -146,8 +147,8 @@ export function ObrasTable({
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => {
-                                setDeletingObraId(obra.id);
-                                setMenuOpenFor(null);
+                                setDeletingObraId(obra.id)
+                                setMenuOpenFor(null)
                               }}
                               className="text-destructive flex items-center gap-2"
                             >
@@ -179,7 +180,7 @@ export function ObrasTable({
       <AlertDialog
         open={deletingObraId !== null}
         onOpenChange={(open) => {
-          if (!open) setDeletingObraId(null);
+          if (!open) setDeletingObraId(null)
         }}
       >
         <AlertDialogContent>
@@ -194,9 +195,9 @@ export function ObrasTable({
             <AlertDialogAction
               onClick={() => {
                 if (deletingObraId !== null) {
-                  onRemove(deletingObraId);
-                  setDeletingObraId(null);
-                  setMenuOpenFor(null);
+                  onRemove(deletingObraId)
+                  setDeletingObraId(null)
+                  setMenuOpenFor(null)
                 }
               }}
               className="bg-destructive text-white hover:bg-destructive/90"
@@ -207,5 +208,5 @@ export function ObrasTable({
         </AlertDialogContent>
       </AlertDialog>
     </>
-  );
+  )
 }

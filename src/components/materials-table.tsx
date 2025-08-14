@@ -93,7 +93,8 @@ export function MaterialsTable({
           <CardDescription>Gestiona el inventario con facilidad desde aquí.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="relative max-h-[400px] overflow-auto">
+          {/* Altura adaptativa: ocupa la ventana menos el espacio del header y padding */}
+          <div className="relative h-[calc(100vh-200px)] overflow-auto pb-1">
             <Table className="min-w-full border-collapse">
               <TableHeader className="sticky top-0 bg-background z-20 shadow-sm">
                 <TableRow>
@@ -185,10 +186,11 @@ export function MaterialsTable({
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
-                              className="h-8 w-8 p-0 bg-transparent border border-red-600"
+                              size="icon"
+                              className="h-8 w-8 p-0 text-primary hover:bg-primary/10"
                               aria-label={`Abrir menú de acciones para ${material.name}`}
                             >
-                              <MoreHorizontal className="h-5 w-5 text-red-700" />
+                              <MoreHorizontal className="h-5 w-5" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent
@@ -225,12 +227,6 @@ export function MaterialsTable({
                 ))}
               </TableBody>
             </Table>
-            <div
-              className="absolute bottom-0 left-0 right-0 overflow-x-auto overflow-y-hidden"
-              style={{ height: '1.5rem' }}
-            >
-              <div style={{ width: 'max-content', minWidth: '100%' }} />
-            </div>
           </div>
         </CardContent>
       </Card>
