@@ -291,7 +291,7 @@ export default function DashboardPage() {
           onAdd={handleAddMaterial}
           trigger={
             <button
-              className="ml-4 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded whitespace-nowrap"
+              className="ml-4 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2 px-4 rounded whitespace-nowrap"
               aria-label="Agregar material"
             >
               + Agregar material
