@@ -93,9 +93,9 @@ export function MaterialsTable({
           <CardDescription>Gestiona el inventario con facilidad desde aquí.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="relative max-h-[400px] overflow-auto">
+          <div className="relative h-[400px] overflow-auto pb 2">
             <Table className="min-w-full border-collapse">
-              <TableHeader className="sticky top-0 bg-white z-20 shadow-sm">
+              <TableHeader className="sticky top-0 bg-background z-20 shadow-sm">
                 <TableRow>
                   <TableHead className="hidden w-[100px] sm:table-cell">
                     <span className="sr-only">Imagen</span>
@@ -185,10 +185,11 @@ export function MaterialsTable({
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
-                              className="h-8 w-8 p-0 bg-transparent border border-red-600"
+                              size="icon"
+                              className="h-8 w-8 p-0 text-primary hover:bg-primary/10"
                               aria-label={`Abrir menú de acciones para ${material.name}`}
                             >
-                              <MoreHorizontal className="h-5 w-5 text-red-700" />
+                              <MoreHorizontal className="h-5 w-5" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent
@@ -225,13 +226,6 @@ export function MaterialsTable({
                 ))}
               </TableBody>
             </Table>
-            {/* Sticky horizontal scrollbar container */}
-            <div
-              className="absolute bottom-0 left-0 right-0 overflow-x-auto overflow-y-hidden"
-              style={{ height: '1.5rem' }}
-            >
-              <div style={{ width: 'max-content', minWidth: '100%' }} />
-            </div>
           </div>
         </CardContent>
       </Card>
