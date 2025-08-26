@@ -27,7 +27,7 @@ export default function Header() {
     <header className="sticky top-0 flex h-16 items-center border-b bg-background px-4 md:px-6 z-50">
       <nav className="hidden md:flex md:items-center">
         <Link
-          href="/dashboard"
+          href="/select-table"
           className="flex items-center"
           aria-label="Innova-Sport"
         >
