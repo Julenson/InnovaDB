@@ -69,7 +69,7 @@ export function ObrasTable({
         </CardHeader>
         <CardContent>
           <div className="relative h-[400px] overflow-auto pb 2">
-            <Table className="min-w-full border-collapse">
+            <Table className="min-w-full border-collapse text-sm">
               <TableHeader className="sticky top-0 bg-background z-20 shadow-sm">
                 <TableRow>
                   <TableHead>Obra</TableHead>
