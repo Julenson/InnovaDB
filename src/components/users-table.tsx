@@ -54,7 +54,7 @@ export function UsersTable({
               <tr key={user.id} className="text-left">
                 <td className="px-4 py-2 border">{user.id}</td>
                 <td className="px-4 py-2 border">{user.email}</td>
-                <td className="px-4 py-2 border flex justify-center items-center gap-2">
+                <td className="px-4 py-2 border flex justify-left items-right gap-2">
                   <span className="font-mono select-none">
                     {isVisible
                       ? user.password ?? '[oculta]'
