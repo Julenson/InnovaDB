@@ -6,90 +6,91 @@ import { Eye, EyeOff } from 'lucide-react';
 
 interface UsersTableProps {
   users: User[];
-  currentUserRole: string;
-  currentUser: User | null;
-  onEdit: (user: User) => void;
-  onDelete: (user: User) => void;
-}
-
-export function UsersTable({
-  users,
-  currentUserRole,
-  currentUser,
-  onEdit,
-  onDelete,
-}: UsersTableProps) {
-  const [visiblePasswords, setVisiblePasswords] = useState<Set<number>>(new Set());
-
-  const togglePasswordVisibility = (id: number) => {
-    setVisiblePasswords((prev) => {
-      const newSet = new Set(prev);
-      newSet.has(id) ? newSet.delete(id) : newSet.add(id);
-      return newSet;
-    });
-  };
-
-  if (!users || users.length === 0) {
-    return (
-      <div className="text-center py-8 text-gray-500">No hay usuarios para mostrar.</div>
-    );
-  }
-
-  return (
-    <div className="overflow-x-auto max-h-[400px]">
-      <table className="w-full table-auto border border-gray-300 border-collapse">
-        <thead className="bg-gray-100 sticky top-0 z-20">
-          <tr>
-            <th className="px-4 py-2 border">ID</th>
-            <th className="px-4 py-2 border">Email</th>
-            <th className="px-4 py-2 border">Contraseña</th>
-            <th className="px-4 py-2 border">Categoría</th>
-            <th className="px-4 py-2 border">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => {
-            const isVisible = visiblePasswords.has(user.id);
-            return (
-              <tr key={user.id} className="text-center">
-                <td className="px-4 py-2 border">{user.id}</td>
-                <td className="px-4 py-2 border">{user.email}</td>
-                <td className="px-4 py-2 border flex justify-center items-center gap-2">
-                  <span className="font-mono select-none">
-                    {isVisible
-                      ? user.password ?? '[oculta]'
-                      : '•'.repeat(user.password?.length || 8)}
-                  </span>
-                  <button
-                    onClick={() => togglePasswordVisibility(user.id)}
-                    aria-label={isVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                    title={isVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                  >
-                    {isVisible ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </td>
-                <td className="px-4 py-2 border">{user.category}</td>
-                <td className="px-4 py-2 border space-x-2">
-                  <button
-                    className="text-blue-600 hover:underline cursor-pointer"
-                    onClick={() => onEdit(user)}
-                    aria-label={`Editar usuario ${user.email}`}
-                  >
-                    Editar
-                  </button>
-                  <button
-                    className="text-red-600 hover:underline cursor-pointer"
-                    onClick={() => onDelete(user)}
-                    aria-label={`Eliminar usuario ${user.email}`}
-                  >
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-}
+    currentUserRole: string;
+      currentUser: User | null;
+        onEdit: (user: User) => void;
+          onDelete: (user: User) => void;
+          }
+          
+          export function UsersTable({
+            users,
+              currentUserRole,
+                currentUser,
+                  onEdit,
+                    onDelete,
+                    }: UsersTableProps) {
+                      const [visiblePasswords, setVisiblePasswords] = useState<Set<number>>(new Set());
+                      
+                        const togglePasswordVisibility = (id: number) => {
+                            setVisiblePasswords((prev) => {
+                                  const newSet = new Set(prev);
+                                        newSet.has(id) ? newSet.delete(id) : newSet.add(id);
+                                              return newSet;
+                                                  });
+                                                    };
+                                                    
+                                                      if (!users || users.length === 0) {
+                                                          return (
+                                                                <div className="text-center py-8 text-gray-500">No hay usuarios para mostrar.</div>
+                                                                    );
+                                                                      }
+                                                                      
+                                                                        return (
+                                                                            <div className="overflow-x-auto max-h-[400px]">
+                                                                                  <table className="w-full table-auto border border-gray-300 border-collapse">
+                                                                                          <thead className="bg-gray-100 sticky top-0 z-20">
+                                                                                                    <tr>
+                                                                                                                <th className="px-4 py-2 border">ID</th>
+                                                                                                                            <th className="px-4 py-2 border">Email</th>
+                                                                                                                                        <th className="px-4 py-2 border">Contraseña</th>
+                                                                                                                                                    <th className="px-4 py-2 border">Categoría</th>
+                                                                                                                                                                <th className="px-4 py-2 border">Acciones</th>
+                                                                                                                                                                          </tr>
+                                                                                                                                                                                  </thead>
+                                                                                                                                                                                          <tbody>
+                                                                                                                                                                                                    {users.map((user) => {
+                                                                                                                                                                                                                const isVisible = visiblePasswords.has(user.id);
+                                                                                                                                                                                                                            return (
+                                                                                                                                                                                                                                          <tr key={user.id} className="text-left">
+                                                                                                                                                                                                                                                          <td className="px-4 py-2 border">{user.id}</td>
+                                                                                                                                                                                                                                                                          <td className="px-4 py-2 border">{user.email}</td>
+                                                                                                                                                                                                                                                                                          <td className="px-4 py-2 border flex justify-center items-center gap-2">
+                                                                                                                                                                                                                                                                                                            <span className="font-mono select-none">
+                                                                                                                                                                                                                                                                                                                                {isVisible
+                                                                                                                                                                                                                                                                                                                                                      ? user.password ?? '[oculta]'
+                                                                                                                                                                                                                                                                                                                                                                            : '•'.repeat(user.password?.length || 8)}
+                                                                                                                                                                                                                                                                                                                                                                                              </span>
+                                                                                                                                                                                                                                                                                                                                                                                                                <button
+                                                                                                                                                                                                                                                                                                                                                                                                                                    onClick={() => togglePasswordVisibility(user.id)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        aria-label={isVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            title={isVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              >
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  {isVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </button>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </td>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <td className="px-4 py-2 border">{user.category}</td>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <td className="px-4 py-2 border space-x-2">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      <button
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          className="text-blue-600 hover:underline cursor-pointer"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              onClick={() => onEdit(user)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  aria-label={`Editar usuario ${user.email}`}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    >
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Editar
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          </button>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <button
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                className="text-red-600 hover:underline cursor-pointer"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    onClick={() => onDelete(user)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        aria-label={`Eliminar usuario ${user.email}`}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          >
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              Eliminar
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </button>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </td>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              </tr>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          );
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    })}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </tbody>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  </table>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        );
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        '
