@@ -31,7 +31,7 @@ export function UsersTable({
 
   if (!users || users.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">No hay usuarios para mostrar.</div>
+      <div className="text-left py-8 text-gray-500">No hay usuarios para mostrar.</div>
     );
   }
 
