@@ -47,12 +47,14 @@ interface ObrasTableProps {
   currentUserRole: string
 }
 
-// 🔹 Formateador de importes estilo español
-const formatImporte = (value: number) => {
-  return new Intl.NumberFormat("es-ES", {
-    minimumFractionDigits: Number.isInteger(value) ? 0 : 2,
+// 🔹 Formateador de importes estilo español (puntos para miles, coma para decimales)
+const formatImporte = (value: number | string) => {
+  const num = typeof value === 'string' ? parseFloat(value) : value
+  if (isNaN(num)) return '—'
+  return new Intl.NumberFormat('es-ES', {
+    minimumFractionDigits: Number.isInteger(num) ? 0 : 2,
     maximumFractionDigits: 2,
-  }).format(value)
+  }).format(num)
 }
 
 export function ObrasTable({
