@@ -51,10 +51,16 @@ interface ObrasTableProps {
 const formatImporte = (value: number | string) => {
   const num = typeof value === 'string' ? parseFloat(value) : value
   if (isNaN(num)) return '—'
-  return new Intl.NumberFormat('es-ES', {
-    minimumFractionDigits: Number.isInteger(num) ? 0 : 2,
-    maximumFractionDigits: 2,
-  }).format(num)
+
+  // separar parte entera y decimal
+  const [intPart, decPart] = num.toFixed(2).split('.')
+
+  // añadir puntos a la parte entera
+  const intFormatted = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+
+  // si los decimales son '00' los ignoramos
+  if (decPart === '00') return intFormatted
+  return `${intFormatted},${decPart}`
 }
 
 export function ObrasTable({
