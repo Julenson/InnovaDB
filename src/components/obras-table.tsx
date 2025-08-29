@@ -47,6 +47,14 @@ interface ObrasTableProps {
   currentUserRole: string
 }
 
+// 🔹 Formateador de importes estilo español
+const formatImporte = (value: number) => {
+  return new Intl.NumberFormat("es-ES", {
+    minimumFractionDigits: Number.isInteger(value) ? 0 : 2,
+    maximumFractionDigits: 2,
+  }).format(value)
+}
+
 export function ObrasTable({
   obras,
   onRemove,
@@ -93,7 +101,11 @@ export function ObrasTable({
                     <TableCell>{obra.email}</TableCell>
                     <TableCell>{obra.provincia}</TableCell>
                     <TableCell>{obra.localidad}</TableCell>
-                    <TableCell>{obra.importe} €</TableCell>
+                    <TableCell>
+                      {obra.importe !== undefined && obra.importe !== null
+                        ? `${formatImporte(obra.importe)} €`
+                        : '—'}
+                    </TableCell>
                     <TableCell>{obra.contacto}</TableCell>
                     <TableCell>{obra.observaciones}</TableCell>
                     <TableCell>
