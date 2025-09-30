@@ -96,8 +96,12 @@ export async function addMaterial(
 ): Promise<Material> {
   await connectClient();
 
-  quantity = parseFloat(quantity.toFixed(2));
-  valor = parseFloat(valor.toFixed(2));
+  if (quantity !== undefined && quantity !== null) {
+    quantity = parseFloat((quantity ?? 0).toFixed(2));
+  }
+  if (valor !== undefined && valor !== null) {
+    valor = parseFloat((valor ?? 0).toFixed(2));
+  }
 
   const result = await client.query(
     `INSERT INTO materials (name, quantity, valor, factura, category, description, updatedBy, lastUpdated, lastDestiny)
